@@ -8,7 +8,7 @@
 
 </div>
 
-A typed, agent-oriented AI SDK for AdonisJS 7 with OpenAI and Anthropic support.
+A typed, agent-oriented AI SDK for AdonisJS 7, built on Vercel AI SDK Core with OpenAI and Anthropic support.
 
 > Status: `0.1.0-alpha.0`. The public API may change before `0.1.0`.
 
@@ -52,7 +52,7 @@ console.log(response.text);
 ## Included
 
 - Reusable typed agents and an anonymous agent factory
-- OpenAI Responses API and Anthropic Messages API adapters
+- A shared Vercel AI SDK adapter for OpenAI Responses and Anthropic Messages
 - Async-iterable streaming and Adonis-friendly SSE conversion
 - Zod 4 structured output and validated application tools
 - Normalized usage, steps, request IDs, errors, and events

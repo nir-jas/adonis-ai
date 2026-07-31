@@ -10,24 +10,25 @@
 
 A Laravel-inspired, agent-oriented AI SDK for AdonisJS 7.
 
-`adonis-ai` gives Adonis applications one typed API for OpenAI and Anthropic, while keeping provider details behind a small adapter contract. The first release focuses on the parts needed to build dependable text agents: streaming, structured output, application tools, observability, cancellation, and network-free tests.
+`adonis-ai` gives Adonis applications one typed API for OpenAI and Anthropic, backed by Vercel AI SDK Core and its provider packages. The first release focuses on the parts needed to build dependable text agents: streaming, structured output, application tools, observability, cancellation, and network-free tests.
 
 > Status: `0.1.0-alpha.0`. The public API is usable, but may change before `0.1.0`.
 
 ## Compatibility
 
-| Dependency | Supported version                  |
-| ---------- | ---------------------------------- |
-| AdonisJS   | `^7.0.0`                           |
-| Node.js    | `>=24.0.0`                         |
-| Zod        | `^4.0.0`                           |
-| OpenAI     | Responses API via the official SDK |
-| Anthropic  | Messages API via the official SDK  |
+| Dependency    | Supported version                        |
+| ------------- | ---------------------------------------- |
+| AdonisJS      | `^7.0.0`                                 |
+| Node.js       | `>=24.0.0`                               |
+| Zod           | `^4.0.0`                                 |
+| Vercel AI SDK | Core with OpenAI and Anthropic providers |
+| OpenAI        | Responses API via `@ai-sdk/openai`       |
+| Anthropic     | Messages API via `@ai-sdk/anthropic`     |
 
 ## What is included
 
 - Reusable `BaseAgent` classes and an `agent({...})` factory
-- OpenAI Responses API and Anthropic Messages API adapters
+- A shared Vercel AI SDK adapter for OpenAI Responses and Anthropic Messages
 - Async-iterable streaming with SSE conversion
 - Zod 4 structured output with provider-native JSON Schema
 - Zod-validated application tools and a shared multi-step tool loop
@@ -220,7 +221,7 @@ ai.extend("community-driver", (config, context) => {
 });
 ```
 
-Provider adapters translate requests, responses, errors, usage, and streaming events only. Agent composition and tool execution remain in the shared engine.
+The Vercel AI SDK provider layer translates model requests, responses, errors, usage, and streaming events. Agent composition and the multi-step application tool loop remain in Adonis AI, preserving the existing public API and extension contract.
 
 ## Security defaults
 
@@ -239,7 +240,7 @@ Provider adapters translate requests, responses, errors, usage, and streaming ev
 
 ## Acknowledgements
 
-The developer experience is inspired by [Laravel AI](https://laravel.com/docs/13.x/ai-sdk), while the implementation follows AdonisJS and TypeScript conventions. OpenAI uses its [Responses API](https://developers.openai.com/api/docs/guides/migrate-to-responses); Anthropic uses its [Messages API](https://platform.claude.com/docs/en/api/messages).
+The developer experience is inspired by [Laravel AI](https://laravel.com/docs/13.x/ai-sdk), while the implementation follows AdonisJS and TypeScript conventions and uses [Vercel AI SDK Core](https://ai-sdk.dev/docs/ai-sdk-core/overview). OpenAI uses its [Responses API](https://developers.openai.com/api/docs/guides/migrate-to-responses); Anthropic uses its [Messages API](https://platform.claude.com/docs/en/api/messages).
 
 MIT licensed.
 

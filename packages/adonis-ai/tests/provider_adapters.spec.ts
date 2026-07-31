@@ -68,7 +68,10 @@ describe("provider adapters", () => {
 
     assert.equal(body?.model, "test-model");
     assert.equal(body?.store, false);
-    assert.equal(body?.instructions, "Be concise.");
+    assert.deepEqual((body?.input as Array<Record<string, unknown>>)[0], {
+      role: "system",
+      content: "Be concise.",
+    });
     assert.equal(response.text, "Hello from OpenAI");
     assert.deepEqual(response.usage, {
       inputTokens: 4,
@@ -135,9 +138,7 @@ describe("provider adapters", () => {
             type: "message",
             role: "assistant",
             model: "test-model",
-            content: [
-              { type: "text", text: "Hello from Claude", citations: null },
-            ],
+            content: [{ type: "text", text: "Hello from Claude" }],
             stop_reason: "end_turn",
             stop_sequence: null,
             usage: { input_tokens: 5, output_tokens: 3 },
@@ -150,7 +151,7 @@ describe("provider adapters", () => {
     const response = await provider.complete(request());
 
     assert.equal(body?.model, "test-model");
-    assert.equal(body?.system, "Be concise.");
+    assert.deepEqual(body?.system, [{ type: "text", text: "Be concise." }]);
     assert.equal(response.text, "Hello from Claude");
     assert.deepEqual(response.usage, {
       inputTokens: 5,
@@ -196,9 +197,21 @@ describe("provider adapters", () => {
       fetch: async () =>
         eventStream([
           {
+            type: "response.output_item.added",
+            sequence_number: 1,
+            output_index: 0,
+            item: {
+              id: "message_1",
+              type: "message",
+              status: "in_progress",
+              role: "assistant",
+              content: [],
+            },
+          },
+          {
             type: "response.output_text.delta",
             delta: "Hello",
-            sequence_number: 1,
+            sequence_number: 2,
             item_id: "message_1",
             output_index: 0,
             content_index: 0,
@@ -207,15 +220,34 @@ describe("provider adapters", () => {
           {
             type: "response.output_text.delta",
             delta: " world",
-            sequence_number: 2,
+            sequence_number: 3,
             item_id: "message_1",
             output_index: 0,
             content_index: 0,
             logprobs: [],
           },
           {
+            type: "response.output_item.done",
+            sequence_number: 4,
+            output_index: 0,
+            item: {
+              id: "message_1",
+              type: "message",
+              status: "completed",
+              role: "assistant",
+              content: [
+                {
+                  type: "output_text",
+                  text: "Hello world",
+                  annotations: [],
+                  logprobs: [],
+                },
+              ],
+            },
+          },
+          {
             type: "response.completed",
-            sequence_number: 3,
+            sequence_number: 5,
             response: {
               id: "resp_stream",
               status: "completed",

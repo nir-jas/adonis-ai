@@ -51,8 +51,9 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.115.0",
-    "openai": "^7.1.0",
+    "@ai-sdk/anthropic": "^4.0.25",
+    "@ai-sdk/openai": "^4.0.25",
+    "ai": "^7.0.44",
     "zod": "^4.4.3"
   },
   "peerDependencies": {

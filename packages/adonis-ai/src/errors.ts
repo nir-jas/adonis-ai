@@ -139,12 +139,13 @@ export function normalizeProviderError(
 
   const candidate = error as {
     status?: number;
+    statusCode?: number;
     name?: string;
     message?: string;
     code?: string;
   };
   const message = candidate?.message ?? `The ${provider} request failed`;
-  const status = candidate?.status;
+  const status = candidate?.status ?? candidate?.statusCode;
 
   if (status === 401 || status === 403)
     return new AuthenticationError(message, provider, error);
