@@ -1,9 +1,12 @@
-# adonis-ai
+<p align="center">
+  <img src="https://raw.githubusercontent.com/nir-jas/adonis-ai/main/.github/assets/adonis-ai-logo.svg" width="520" alt="Adonis AI">
+</p>
 
-[![CI](https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
-[![Node.js version](https://img.shields.io/node/v/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
-[![license](https://img.shields.io/npm/l/adonis-ai.svg)](https://github.com/nir-jas/adonis-ai/blob/main/LICENSE.md)
+<div align="center">
+
+[![Tests][tests-image]][tests-url] [![npm][npm-image]][npm-url] ![TypeScript][typescript-image] [![License][license-image]][license-url]
+
+</div>
 
 A typed, agent-oriented AI SDK for AdonisJS 7 with OpenAI and Anthropic support.
 
@@ -56,3 +59,11 @@ console.log(response.text);
 - IoC integration, Ace generators, cancellation, and testing fakes
 
 See the [full documentation and playground](https://github.com/nir-jas/adonis-ai#readme). Ask questions in [Discussions](https://github.com/nir-jas/adonis-ai/discussions), report bugs through [Issues](https://github.com/nir-jas/adonis-ai/issues), and report vulnerabilities through [private security advisories](https://github.com/nir-jas/adonis-ai/security/advisories/new).
+
+[tests-image]: https://img.shields.io/github/actions/workflow/status/nir-jas/adonis-ai/ci.yml?branch=main&label=Tests&style=for-the-badge&colorA=15122e&colorB=8b7cff&logo=githubactions&logoColor=white
+[tests-url]: https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml
+[npm-image]: https://img.shields.io/npm/v/adonis-ai/latest.svg?style=for-the-badge&colorA=15122e&colorB=ff5a4f&logo=npm&logoColor=white
+[npm-url]: https://www.npmjs.com/package/adonis-ai/v/latest
+[typescript-image]: https://img.shields.io/badge/TypeScript-3178c6.svg?style=for-the-badge&labelColor=15122e&logo=typescript&logoColor=white
+[license-image]: https://img.shields.io/github/license/nir-jas/adonis-ai?style=for-the-badge&colorA=15122e&colorB=43d9c2
+[license-url]: https://github.com/nir-jas/adonis-ai/blob/main/LICENSE.md

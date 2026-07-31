@@ -1,10 +1,12 @@
-# Adonis AI
+<p align="center">
+  <img src="./.github/assets/adonis-ai-logo.svg" width="560" alt="Adonis AI">
+</p>
 
-[![CI](https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
-[![npm downloads](https://img.shields.io/npm/dm/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
-[![Node.js version](https://img.shields.io/node/v/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
-[![license](https://img.shields.io/npm/l/adonis-ai.svg)](./LICENSE.md)
+<div align="center">
+
+[![Tests][tests-image]][tests-url] [![npm][npm-image]][npm-url] ![TypeScript][typescript-image] [![License][license-image]][license-url]
+
+</div>
 
 A Laravel-inspired, agent-oriented AI SDK for AdonisJS 7.
 
@@ -240,3 +242,11 @@ Provider adapters translate requests, responses, errors, usage, and streaming ev
 The developer experience is inspired by [Laravel AI](https://laravel.com/docs/13.x/ai-sdk), while the implementation follows AdonisJS and TypeScript conventions. OpenAI uses its [Responses API](https://developers.openai.com/api/docs/guides/migrate-to-responses); Anthropic uses its [Messages API](https://platform.claude.com/docs/en/api/messages).
 
 MIT licensed.
+
+[tests-image]: https://img.shields.io/github/actions/workflow/status/nir-jas/adonis-ai/ci.yml?branch=main&label=Tests&style=for-the-badge&colorA=15122e&colorB=8b7cff&logo=githubactions&logoColor=white
+[tests-url]: https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml
+[npm-image]: https://img.shields.io/npm/v/adonis-ai/latest.svg?style=for-the-badge&colorA=15122e&colorB=ff5a4f&logo=npm&logoColor=white
+[npm-url]: https://www.npmjs.com/package/adonis-ai/v/latest
+[typescript-image]: https://img.shields.io/badge/TypeScript-3178c6.svg?style=for-the-badge&labelColor=15122e&logo=typescript&logoColor=white
+[license-image]: https://img.shields.io/github/license/nir-jas/adonis-ai?style=for-the-badge&colorA=15122e&colorB=43d9c2
+[license-url]: ./LICENSE.md
