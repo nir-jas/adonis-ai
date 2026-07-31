@@ -4,10 +4,21 @@
   "description": "A Laravel-inspired AI SDK for AdonisJS 7",
   "keywords": [
     "adonisjs",
+    "adonisjs7",
+    "adonisjs-package",
     "ai",
+    "ai-sdk",
+    "ai-agents",
+    "agentic-ai",
+    "llm",
+    "typescript",
+    "nodejs",
     "openai",
     "anthropic",
-    "agents"
+    "streaming",
+    "structured-output",
+    "tool-calling",
+    "zod"
   ],
   "license": "MIT",
   "type": "module",
