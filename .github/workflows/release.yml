@@ -10,6 +10,14 @@ permissions:
   id-token: write
   pull-requests: write
 
+env:
+  HOST: 127.0.0.1
+  PORT: 3333
+  LOG_LEVEL: info
+  APP_KEY: ci-test-key-0123456789abcdefghij
+  APP_URL: http://127.0.0.1:3333
+  SESSION_DRIVER: memory
+
 jobs:
   release:
     runs-on: ubuntu-latest
