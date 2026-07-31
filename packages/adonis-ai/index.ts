@@ -6,6 +6,7 @@ export { defineConfig } from "./src/config.js";
 export type {
   AiConfig,
   AiConfigInput,
+  AiGatewayProviderConfig,
   AnthropicProviderConfig,
   OpenAiProviderConfig,
   ProviderConfig,

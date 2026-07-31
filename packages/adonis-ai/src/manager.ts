@@ -24,6 +24,7 @@ import type {
   ProviderStepResponse,
 } from "./provider.js";
 import { AnthropicProvider } from "./providers/anthropic_provider.js";
+import { AiGatewayProvider } from "./providers/gateway_provider.js";
 import { OpenAiProvider } from "./providers/openai_provider.js";
 import { setAiManagerResolver } from "./runtime.js";
 import type { AgentStream } from "./stream.js";
@@ -71,6 +72,9 @@ export class AiManager {
     });
     this.extend("anthropic", (providerConfig, context) => {
       return new AnthropicProvider(providerConfig, context.name);
+    });
+    this.extend("gateway", (providerConfig, context) => {
+      return new AiGatewayProvider(providerConfig, context.name);
     });
   }
 

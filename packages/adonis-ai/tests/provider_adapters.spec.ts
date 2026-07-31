@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { MockLanguageModelV4 } from "ai/test";
+import { AiSdkProvider } from "../src/providers/ai_sdk_provider.js";
 import { AnthropicProvider } from "../src/providers/anthropic_provider.js";
 import { OpenAiProvider } from "../src/providers/openai_provider.js";
 import type { ProviderRequest, ProviderStreamEvent } from "../src/provider.js";
@@ -22,6 +24,53 @@ function request(overrides: Partial<ProviderRequest> = {}): ProviderRequest {
 }
 
 describe("provider adapters", () => {
+  it("accepts any AI SDK language model and preserves namespaced options", async () => {
+    let requestedModel: string | undefined;
+    const model = new MockLanguageModelV4({
+      provider: "community-provider",
+      modelId: "community-model",
+      doGenerate: {
+        content: [{ type: "text", text: "Hello from any model" }],
+        finishReason: { unified: "stop", raw: undefined },
+        usage: {
+          inputTokens: {
+            total: 3,
+            noCache: 3,
+            cacheRead: 0,
+            cacheWrite: 0,
+          },
+          outputTokens: { total: 4, text: 4, reasoning: 0 },
+        },
+        response: { id: "generic_1", modelId: "community-model" },
+        warnings: [],
+      },
+    });
+    const provider = new AiSdkProvider({
+      name: "community",
+      model: (modelId) => {
+        requestedModel = modelId;
+        return model;
+      },
+    });
+
+    const response = await provider.complete(
+      request({
+        model: "chosen-model",
+        providerOptions: {
+          gateway: { order: ["vertex"] },
+          community: { featureFlag: true },
+        },
+      }),
+    );
+
+    assert.equal(requestedModel, "chosen-model");
+    assert.equal(response.text, "Hello from any model");
+    assert.deepEqual(model.doGenerateCalls[0]?.providerOptions, {
+      gateway: { order: ["vertex"] },
+      community: { featureFlag: true },
+    });
+  });
+
   it("maps an OpenAI Responses API request and response", async () => {
     let body: Record<string, unknown> | undefined;
     const provider = new OpenAiProvider({

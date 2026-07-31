@@ -4,15 +4,20 @@ import { z } from "zod";
 import { AiManager, agent, defineTool } from "../../index.js";
 
 const provider = process.env.AI_LIVE_PROVIDER;
-const enabled = provider === "openai" || provider === "anthropic";
+const enabled =
+  provider === "openai" || provider === "anthropic" || provider === "gateway";
 const apiKey =
   provider === "openai"
     ? process.env.OPENAI_API_KEY
-    : process.env.ANTHROPIC_API_KEY;
+    : provider === "anthropic"
+      ? process.env.ANTHROPIC_API_KEY
+      : process.env.AI_GATEWAY_API_KEY;
 const model =
   provider === "openai"
     ? process.env.OPENAI_MODEL
-    : process.env.ANTHROPIC_MODEL;
+    : provider === "anthropic"
+      ? process.env.ANTHROPIC_MODEL
+      : process.env.AI_GATEWAY_MODEL;
 
 describe(
   "live provider acceptance",

@@ -31,7 +31,7 @@ type AiSdkCallProviderOptions = NonNullable<
 
 export interface AiSdkProviderOptions {
   name: string;
-  providerOptionsKey: string;
+  providerOptionsKey?: string;
   model: (modelId: string) => LanguageModel;
   maxRetries?: number;
   defaultProviderOptions?: Record<string, unknown>;
@@ -62,7 +62,7 @@ export class AiSdkProvider implements ProviderAdapter {
   };
 
   readonly name: string;
-  #providerOptionsKey: string;
+  #providerOptionsKey: string | undefined;
   #model: (modelId: string) => LanguageModel;
   #maxRetries: number;
   #defaultProviderOptions: Record<string, unknown>;
@@ -173,15 +173,38 @@ export class AiSdkProvider implements ProviderAdapter {
   #providerOptions(
     requestOptions: Record<string, unknown> | undefined,
   ): AiSdkCallProviderOptions | undefined {
-    const options = {
+    const options = requestOptions ?? {};
+    if (!this.#providerOptionsKey) {
+      return Object.keys(options).length > 0
+        ? (options as AiSdkCallProviderOptions)
+        : undefined;
+    }
+
+    const scopedOptions = options[this.#providerOptionsKey];
+
+    if (isRecord(scopedOptions)) {
+      return {
+        ...options,
+        [this.#providerOptionsKey]: {
+          ...this.#defaultProviderOptions,
+          ...scopedOptions,
+        },
+      } as AiSdkCallProviderOptions;
+    }
+
+    const providerOptions = {
       ...this.#defaultProviderOptions,
-      ...(requestOptions ?? {}),
+      ...options,
     };
-    if (Object.keys(options).length === 0) return undefined;
+    if (Object.keys(providerOptions).length === 0) return undefined;
     return {
-      [this.#providerOptionsKey]: options,
+      [this.#providerOptionsKey]: providerOptions,
     } as AiSdkCallProviderOptions;
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function toAiSdkTools(providerTools: ProviderTool[]): ToolSet {

@@ -8,6 +8,8 @@
     "adonisjs-package",
     "ai",
     "ai-sdk",
+    "vercel-ai-sdk",
+    "ai-gateway",
     "ai-agents",
     "agentic-ai",
     "llm",
@@ -31,8 +33,10 @@
   "exports": {
     ".": "./build/index.js",
     "./provider": "./build/src/provider.js",
+    "./providers/ai-sdk": "./build/src/providers/ai_sdk_provider.js",
     "./providers/openai": "./build/src/providers/openai_provider.js",
     "./providers/anthropic": "./build/src/providers/anthropic_provider.js",
+    "./providers/gateway": "./build/src/providers/gateway_provider.js",
     "./services/main": "./build/services/main.js",
     "./ai_provider": "./build/providers/ai_provider.js",
     "./commands": "./build/commands/main.js",
@@ -47,6 +51,7 @@
     "test": "node --import=tsx --test \"tests/**/*.spec.ts\"",
     "test:live:openai": "AI_LIVE_PROVIDER=openai node --import=tsx --test tests/live/provider.live.spec.ts",
     "test:live:anthropic": "AI_LIVE_PROVIDER=anthropic node --import=tsx --test tests/live/provider.live.spec.ts",
+    "test:live:gateway": "AI_LIVE_PROVIDER=gateway node --import=tsx --test tests/live/provider.live.spec.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepack": "npm run build"
   },

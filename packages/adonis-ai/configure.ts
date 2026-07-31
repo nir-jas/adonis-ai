@@ -16,6 +16,8 @@ export async function configure(command: Configure): Promise<void> {
     OPENAI_MODEL: "",
     ANTHROPIC_API_KEY: "",
     ANTHROPIC_MODEL: "",
+    AI_GATEWAY_API_KEY: "",
+    AI_GATEWAY_MODEL: "",
   });
 
   await codemods.defineEnvValidations({
@@ -27,6 +29,8 @@ export async function configure(command: Configure): Promise<void> {
       OPENAI_MODEL: "Env.schema.string.optional()",
       ANTHROPIC_API_KEY: "Env.schema.string.optional()",
       ANTHROPIC_MODEL: "Env.schema.string.optional()",
+      AI_GATEWAY_API_KEY: "Env.schema.string.optional()",
+      AI_GATEWAY_MODEL: "Env.schema.string.optional()",
     },
   });
 

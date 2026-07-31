@@ -30,9 +30,11 @@ export default await Env.create(new URL('../', import.meta.url), {
   | AI providers
   |----------------------------------------------------------
   */
-  AI_DEFAULT_PROVIDER: Env.schema.enum.optional(['openai', 'anthropic'] as const),
+  AI_DEFAULT_PROVIDER: Env.schema.enum.optional(['openai', 'anthropic', 'gateway'] as const),
   OPENAI_API_KEY: Env.schema.string.optional(),
   OPENAI_MODEL: Env.schema.string.optional(),
   ANTHROPIC_API_KEY: Env.schema.string.optional(),
   ANTHROPIC_MODEL: Env.schema.string.optional(),
+  AI_GATEWAY_API_KEY: Env.schema.string.optional(),
+  AI_GATEWAY_MODEL: Env.schema.string.optional(),
 })
