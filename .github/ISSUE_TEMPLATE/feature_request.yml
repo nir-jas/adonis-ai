@@ -3,17 +3,48 @@ description: Propose an addition to the Adonis AI SDK
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests should describe the problem and the intended developer experience without assuming a specific internal implementation.
   - type: textarea
+    id: problem
     attributes:
       label: Problem
       description: What problem should the SDK solve?
     validations:
       required: true
   - type: textarea
+    id: proposed_api
     attributes:
       label: Proposed API
       description: Show the developer experience you would like, if possible.
+      render: typescript
   - type: textarea
+    id: alternatives
     attributes:
       label: Alternatives
       description: What workarounds or other designs have you considered?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Agent API
+        - Provider adapter
+        - Streaming
+        - Structured output
+        - Tools
+        - Testing
+        - AdonisJS integration
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and discussions for similar requests.
+          required: true

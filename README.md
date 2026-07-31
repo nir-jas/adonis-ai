@@ -1,10 +1,26 @@
 # Adonis AI
 
+[![CI](https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
+[![npm downloads](https://img.shields.io/npm/dm/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
+[![Node.js version](https://img.shields.io/node/v/adonis-ai.svg)](https://www.npmjs.com/package/adonis-ai)
+[![license](https://img.shields.io/npm/l/adonis-ai.svg)](./LICENSE.md)
+
 A Laravel-inspired, agent-oriented AI SDK for AdonisJS 7.
 
 `adonis-ai` gives Adonis applications one typed API for OpenAI and Anthropic, while keeping provider details behind a small adapter contract. The first release focuses on the parts needed to build dependable text agents: streaming, structured output, application tools, observability, cancellation, and network-free tests.
 
 > Status: `0.1.0-alpha.0`. The public API is usable, but may change before `0.1.0`.
+
+## Compatibility
+
+| Dependency | Supported version                  |
+| ---------- | ---------------------------------- |
+| AdonisJS   | `^7.0.0`                           |
+| Node.js    | `>=24.0.0`                         |
+| Zod        | `^4.0.0`                           |
+| OpenAI     | Responses API via the official SDK |
+| Anthropic  | Messages API via the official SDK  |
 
 ## What is included
 
@@ -212,7 +228,12 @@ Provider adapters translate requests, responses, errors, usage, and streaming ev
 - Default timeout is 60 seconds with two SDK-level retries
 - API keys are never included in normalized events or errors
 
-See [SECURITY.md](./SECURITY.md) for reporting instructions and [CONTRIBUTING.md](./CONTRIBUTING.md) for the development workflow.
+## Support
+
+- Ask usage and design questions in [GitHub Discussions](https://github.com/nir-jas/adonis-ai/discussions).
+- Report reproducible bugs and request features through [GitHub Issues](https://github.com/nir-jas/adonis-ai/issues).
+- Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/nir-jas/adonis-ai/security/advisories/new).
+- See [SUPPORT.md](./SUPPORT.md), [SECURITY.md](./SECURITY.md), and [CONTRIBUTING.md](./CONTRIBUTING.md) for project policies.
 
 ## Acknowledgements
 
