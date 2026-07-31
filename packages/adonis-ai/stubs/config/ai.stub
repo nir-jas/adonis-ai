@@ -1,0 +1,32 @@
+{{{
+  exports({
+    to: app.configPath('ai.ts')
+  })
+}}}
+import env from '#start/env'
+import { defineConfig } from 'adonis-ai'
+
+export default defineConfig({
+  default: env.get('AI_DEFAULT_PROVIDER', 'openai'),
+  maxSteps: 8,
+  maxOutputTokens: 4096,
+  timeout: 60_000,
+  maxRetries: 2,
+  includeRaw: false,
+  includeContentInEvents: false,
+
+  providers: {
+    openai: {
+      driver: 'openai',
+      apiKey: env.get('OPENAI_API_KEY', ''),
+      model: env.get('OPENAI_MODEL', ''),
+      store: false,
+    },
+
+    anthropic: {
+      driver: 'anthropic',
+      apiKey: env.get('ANTHROPIC_API_KEY', ''),
+      model: env.get('ANTHROPIC_MODEL', ''),
+    },
+  },
+})

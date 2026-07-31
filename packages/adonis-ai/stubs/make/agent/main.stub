@@ -1,0 +1,14 @@
+{{#var agentName = generators.eventName(entity.name) + 'Agent'}}
+{{#var agentFileName = generators.eventFileName(agentName)}}
+{{{
+  exports({
+    to: app.makePath('app/ai/agents', entity.path, agentFileName)
+  })
+}}}
+import { BaseAgent } from 'adonis-ai'
+
+export default class {{ agentName }} extends BaseAgent {
+  instructions() {
+    return 'You are a helpful assistant.'
+  }
+}

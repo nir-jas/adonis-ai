@@ -1,0 +1,87 @@
+@layout()
+  <section class="playground-shell">
+    <header class="playground-header">
+      <div>
+        <span class="eyebrow">AdonisJS 7 package lab</span>
+        <h1>Adonis AI SDK Playground</h1>
+        <p>
+          Run one agent against OpenAI or Anthropic, inspect its steps, and watch normalized events stream in real time.
+        </p>
+      </div>
+      <span class="version">v0.1 alpha</span>
+    </header>
+
+    <div class="playground-grid">
+      <form id="ai-form" class="control-panel">
+        <div class="field-row">
+          <label>
+            Provider
+            <select id="provider" name="provider">
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+            </select>
+          </label>
+          <label>
+            
+            Model
+
+            <input id="model" name="model" placeholder="Uses config when blank" />
+          </label>
+        </div>
+
+        <label>
+          Example
+          <select id="mode" name="mode">
+            <option value="chat">Ordinary chat</option>
+            <option value="tool">Deterministic local weather tool</option>
+            <option value="structured">Structured output</option>
+          </select>
+        </label>
+
+        <label>
+          
+          Prompt
+
+          <textarea
+            id="prompt"
+            name="prompt"
+            rows="7"
+          >Explain why async iterables are useful for AI streaming.</textarea>
+        </label>
+
+        <div class="actions">
+          <button type="submit">Run agent</button>
+          <button id="stream-button" class="secondary" type="button">Stream response</button>
+        </div>
+        <p class="hint">
+          Weather mode uses a local deterministic tool. Other modes call the selected provider.
+        </p>
+      </form>
+
+      <section class="result-panel" aria-live="polite">
+        <div class="result-heading">
+          <h2>Response</h2>
+          <span id="status" class="status idle">Ready</span>
+        </div>
+        <pre id="answer" class="answer">Choose a mode and run the agent.</pre>
+        <div id="error" class="error" hidden></div>
+
+        <div class="inspector-grid">
+          <section>
+            <h3>Usage</h3>
+            <pre id="usage">—</pre>
+          </section>
+          <section>
+            <h3>Steps & tool calls</h3>
+            <pre id="steps">—</pre>
+          </section>
+        </div>
+
+        <section>
+          <h3>Normalized event log</h3>
+          <pre id="events" class="events">—</pre>
+        </section>
+      </section>
+    </div>
+  </section>
+@end

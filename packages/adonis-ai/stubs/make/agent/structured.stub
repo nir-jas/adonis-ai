@@ -1,0 +1,21 @@
+{{#var agentName = generators.eventName(entity.name) + 'Agent'}}
+{{#var agentFileName = generators.eventFileName(agentName)}}
+{{{
+  exports({
+    to: app.makePath('app/ai/agents', entity.path, agentFileName)
+  })
+}}}
+import { BaseAgent } from 'adonis-ai'
+import { z } from 'zod'
+
+const outputSchema = z.object({
+  answer: z.string(),
+})
+
+export default class {{ agentName }} extends BaseAgent<typeof outputSchema> {
+  readonly outputSchema = outputSchema
+
+  instructions() {
+    return 'Return a concise, structured answer.'
+  }
+}

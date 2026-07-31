@@ -1,0 +1,21 @@
+{{#var toolName = generators.eventName(entity.name) + 'Tool'}}
+{{#var toolFileName = generators.eventFileName(toolName)}}
+{{#var toolIdentifier = generators.eventName(entity.name)}}
+{{{
+  exports({
+    to: app.makePath('app/ai/tools', entity.path, toolFileName)
+  })
+}}}
+import { defineTool } from 'adonis-ai'
+import { z } from 'zod'
+
+export default defineTool({
+  name: '{{ toolIdentifier }}',
+  description: 'Describe when the model should use this tool.',
+  input: z.object({
+    value: z.string(),
+  }),
+  execute({ value }) {
+    return { value }
+  },
+})
