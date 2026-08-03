@@ -15,6 +15,7 @@ export {
   AiError,
   AuthenticationError,
   ConfigurationError,
+  ConversationPersistenceError,
   InvalidRequestError,
   MaxStepsExceededError,
   ProviderOverloadedError,
@@ -22,6 +23,7 @@ export {
   StructuredOutputError,
   TimeoutError,
   ToolExecutionError,
+  UnsupportedCapabilityError,
 } from "./src/errors.js";
 export { AiManager } from "./src/manager.js";
 export type { ManagerOptions } from "./src/manager.js";
@@ -32,7 +34,14 @@ export type {
   AgentResponse,
   AgentStep,
   AgentStreamEvent,
+  AttachmentRecord,
   AssistantMessage,
+  ConversationOptions,
+  ConversationRunContext,
+  ConversationStore,
+  ConversationTurn,
+  FileContentPart,
+  FileSource,
   FinishReason,
   InferAgentOutput,
   Message,
@@ -42,11 +51,16 @@ export type {
   ToolCall,
   ToolErrorMode,
   ToolExecution,
+  ToolMessage,
+  TextContentPart,
+  UserContent,
   UserMessage,
 } from "./src/types.js";
 export type {
   AiEventDispatcher,
   AiEvents,
+  AiConversationEvent,
+  AiConversationFailedEvent,
   AiRunCompletedEvent,
   AiRunEvent,
   AiRunFailedEvent,

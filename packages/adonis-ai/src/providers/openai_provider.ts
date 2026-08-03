@@ -35,6 +35,10 @@ export class OpenAiProvider extends AiSdkProvider {
         ? { maxRetries: config.maxRetries }
         : {}),
       defaultProviderOptions: { store: config.store ?? false },
+      attachments: {
+        images: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+        documents: ["application/pdf"],
+      },
     });
   }
 }

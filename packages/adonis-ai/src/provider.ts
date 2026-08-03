@@ -48,6 +48,12 @@ export interface ProviderCapabilities {
   streaming: boolean;
   tools: boolean;
   structuredOutput: boolean;
+  attachments?: ProviderAttachmentCapabilities;
+}
+
+export interface ProviderAttachmentCapabilities {
+  images?: readonly string[];
+  documents?: readonly string[];
 }
 
 export interface ProviderAdapter {

@@ -13,6 +13,8 @@ import {
 import { normalizeProviderError } from "../errors.js";
 import type {
   ProviderAdapter,
+  ProviderAttachmentCapabilities,
+  ProviderCapabilities,
   ProviderRequest,
   ProviderStepResponse,
   ProviderStreamEvent,
@@ -35,6 +37,7 @@ export interface AiSdkProviderOptions {
   model: (modelId: string) => LanguageModel;
   maxRetries?: number;
   defaultProviderOptions?: Record<string, unknown>;
+  attachments?: ProviderAttachmentCapabilities;
 }
 
 interface AiSdkResult {
@@ -55,11 +58,7 @@ interface AiSdkResult {
 }
 
 export class AiSdkProvider implements ProviderAdapter {
-  readonly capabilities = {
-    streaming: true,
-    tools: true,
-    structuredOutput: true,
-  };
+  readonly capabilities: ProviderCapabilities;
 
   readonly name: string;
   #providerOptionsKey: string | undefined;
@@ -73,6 +72,12 @@ export class AiSdkProvider implements ProviderAdapter {
     this.#model = options.model;
     this.#maxRetries = options.maxRetries ?? 2;
     this.#defaultProviderOptions = options.defaultProviderOptions ?? {};
+    this.capabilities = {
+      streaming: true,
+      tools: true,
+      structuredOutput: true,
+      ...(options.attachments ? { attachments: options.attachments } : {}),
+    };
   }
 
   async complete(request: ProviderRequest): Promise<ProviderStepResponse> {
@@ -224,7 +229,25 @@ function toAiSdkTools(providerTools: ProviderTool[]): ToolSet {
 function toModelMessages(messages: InternalMessage[]): ModelMessage[] {
   return messages.map((message) => {
     if (message.role === "user") {
-      return { role: "user", content: message.content };
+      return {
+        role: "user",
+        content:
+          typeof message.content === "string"
+            ? message.content
+            : message.content.map((part) => {
+                if (part.type === "text") return part;
+                const data =
+                  part.source.type === "url"
+                    ? { type: "url" as const, url: new URL(part.source.url) }
+                    : { type: "data" as const, data: part.source.data };
+                return {
+                  type: "file" as const,
+                  data,
+                  mediaType: part.mediaType,
+                  ...(part.filename ? { filename: part.filename } : {}),
+                };
+              }),
+      };
     }
     if (message.role === "tool") {
       return {

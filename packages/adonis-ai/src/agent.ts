@@ -9,6 +9,7 @@ import type {
   Message,
   OutputSchema,
   RunOptions,
+  UserContent,
 } from "./types.js";
 
 export interface AgentLike<
@@ -42,7 +43,7 @@ export abstract class BaseAgent<
   }
 
   async prompt(
-    input: string,
+    input: UserContent,
     options: RunOptions = {},
   ): Promise<AgentResponse<InferAgentOutput<TSchema>>> {
     const ai = await resolveAiManager();
@@ -50,7 +51,7 @@ export abstract class BaseAgent<
   }
 
   stream(
-    input: string,
+    input: UserContent,
     options: RunOptions = {},
   ): AgentStream<InferAgentOutput<TSchema>> {
     return new AgentStream(async ({ emit, signal }) => {

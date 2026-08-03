@@ -176,6 +176,68 @@ describe("provider adapters", () => {
     ]);
   });
 
+  it("maps byte and URL attachments into OpenAI Responses content", async () => {
+    let body: Record<string, unknown> | undefined;
+    const provider = new OpenAiProvider({
+      apiKey: "test",
+      fetch: async (_input, init) => {
+        body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+        return Response.json({
+          id: "resp_files",
+          status: "completed",
+          model: "test-model",
+          output: [
+            {
+              id: "message_files",
+              type: "message",
+              status: "completed",
+              role: "assistant",
+              content: [
+                {
+                  type: "output_text",
+                  text: "Inspected",
+                  annotations: [],
+                  logprobs: [],
+                },
+              ],
+            },
+          ],
+          usage: { input_tokens: 2, output_tokens: 1, total_tokens: 3 },
+        });
+      },
+    });
+
+    await provider.complete(
+      request({
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "Inspect both" },
+              {
+                type: "file",
+                mediaType: "image/png",
+                source: { type: "bytes", data: new Uint8Array([1, 2, 3]) },
+              },
+              {
+                type: "file",
+                mediaType: "application/pdf",
+                filename: "report.pdf",
+                source: { type: "url", url: "https://example.com/report.pdf" },
+              },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const serialized = JSON.stringify(body);
+    assert.match(serialized, /input_image/);
+    assert.match(serialized, /data:image\/png;base64,AQID/);
+    assert.match(serialized, /input_file/);
+    assert.match(serialized, /https:\/\/example\.com\/report\.pdf/);
+  });
+
   it("maps an Anthropic Messages API request and response", async () => {
     let body: Record<string, unknown> | undefined;
     const provider = new AnthropicProvider({
@@ -239,6 +301,56 @@ describe("provider adapters", () => {
     assert.deepEqual(response.toolCalls, [
       { id: "tool_1", name: "weather", arguments: { city: "Paris" } },
     ]);
+  });
+
+  it("maps base64 and URL documents into Anthropic Messages content", async () => {
+    let body: Record<string, unknown> | undefined;
+    const provider = new AnthropicProvider({
+      apiKey: "test",
+      fetch: async (_input, init) => {
+        body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+        return Response.json({
+          id: "msg_files",
+          type: "message",
+          role: "assistant",
+          model: "test-model",
+          content: [{ type: "text", text: "Inspected" }],
+          stop_reason: "end_turn",
+          stop_sequence: null,
+          usage: { input_tokens: 2, output_tokens: 1 },
+        });
+      },
+    });
+
+    await provider.complete(
+      request({
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "file",
+                mediaType: "application/pdf",
+                filename: "inline.pdf",
+                source: { type: "base64", data: "AQID" },
+              },
+              {
+                type: "file",
+                mediaType: "application/pdf",
+                filename: "remote.pdf",
+                source: { type: "url", url: "https://example.com/remote.pdf" },
+              },
+            ],
+          },
+        ],
+      }),
+    );
+
+    const serialized = JSON.stringify(body);
+    assert.match(serialized, /"type":"document"/);
+    assert.match(serialized, /"type":"base64"/);
+    assert.match(serialized, /"data":"AQID"/);
+    assert.match(serialized, /https:\/\/example\.com\/remote\.pdf/);
   });
 
   it("normalizes provider authentication and rate-limit failures", async () => {

@@ -9,6 +9,8 @@ export type AiErrorCode =
   | "E_AI_TOOL"
   | "E_AI_MAX_STEPS"
   | "E_AI_ABORTED"
+  | "E_AI_UNSUPPORTED_CAPABILITY"
+  | "E_AI_CONVERSATION"
   | "E_AI_PROVIDER";
 
 export interface AiErrorOptions {
@@ -105,6 +107,26 @@ export class InvalidRequestError extends AiError {
     cause?: unknown,
   ) {
     super(message, { code: "E_AI_INVALID_REQUEST", provider, status, cause });
+  }
+}
+
+export class UnsupportedCapabilityError extends AiError {
+  constructor(message: string, provider?: string, cause?: unknown) {
+    super(message, {
+      code: "E_AI_UNSUPPORTED_CAPABILITY",
+      provider,
+      status: 400,
+      cause,
+    });
+  }
+}
+
+export class ConversationPersistenceError extends AiError {
+  readonly operation: "load" | "append";
+
+  constructor(message: string, operation: "load" | "append", cause?: unknown) {
+    super(message, { code: "E_AI_CONVERSATION", cause });
+    this.operation = operation;
   }
 }
 

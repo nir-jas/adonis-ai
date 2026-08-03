@@ -7,7 +7,9 @@ import type {
   ProviderStreamEvent,
 } from "./provider.js";
 import type {
+  AttachmentRecord,
   FinishReason,
+  Message,
   PromptRecord,
   TokenUsage,
   ToolCall,
@@ -37,6 +39,7 @@ export class FakeProvider implements ProviderAdapter {
     streaming: true,
     tools: true,
     structuredOutput: true,
+    attachments: { images: ["image/*"], documents: ["*/*"] },
   };
 
   #responses: FakeResponse[];
@@ -136,6 +139,9 @@ export interface PromptMatcherObject {
   agent?: string;
   prompt?: string | RegExp;
   provider?: string;
+  conversationId?: string;
+  messages?: (messages: readonly Message[]) => boolean;
+  attachment?: Partial<AttachmentRecord>;
 }
 
 export type PromptMatcher =
@@ -200,6 +206,22 @@ function matchesPrompt(record: PromptRecord, matcher: PromptMatcher): boolean {
   if (matcher instanceof RegExp) return matcher.test(record.prompt);
   if (matcher.agent && matcher.agent !== record.agent) return false;
   if (matcher.provider && matcher.provider !== record.provider) return false;
+  if (
+    matcher.conversationId &&
+    matcher.conversationId !== record.conversationId
+  )
+    return false;
+  if (matcher.messages && !matcher.messages(record.messages ?? []))
+    return false;
+  if (
+    matcher.attachment &&
+    !(record.attachments ?? []).some((attachment) =>
+      Object.entries(matcher.attachment!).every(
+        ([key, value]) => attachment[key as keyof AttachmentRecord] === value,
+      ),
+    )
+  )
+    return false;
   if (
     typeof matcher.prompt === "string" &&
     !record.prompt.includes(matcher.prompt)

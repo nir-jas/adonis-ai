@@ -10,6 +10,10 @@ interface GatewayConfig {
   headers?: Record<string, string>;
   metadataCacheRefreshMillis?: number;
   fetch?: typeof fetch;
+  attachments?: {
+    images?: readonly string[];
+    documents?: readonly string[];
+  };
 }
 
 export class AiGatewayProvider extends AiSdkProvider {
@@ -28,6 +32,7 @@ export class AiGatewayProvider extends AiSdkProvider {
     super({
       name,
       model: (modelId) => gateway.languageModel(modelId),
+      ...(config.attachments ? { attachments: config.attachments } : {}),
       ...(config.maxRetries !== undefined
         ? { maxRetries: config.maxRetries }
         : {}),

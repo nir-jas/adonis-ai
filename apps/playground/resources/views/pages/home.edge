@@ -1,63 +1,187 @@
 @layout()
   <section class="playground-shell">
     <header class="playground-header">
-      <div>
+      <div class="playground-title">
         <span class="eyebrow">AdonisJS 7 package lab</span>
         <h1>Adonis AI SDK Playground</h1>
+      </div>
+      <div class="playground-intro">
         <p>
-          Run one agent against OpenAI or Anthropic, inspect its steps, and watch normalized events stream in real time.
+          Exercise every runtime feature against OpenAI, Anthropic, or AI Gateway, then inspect the normalized request, response, tools, usage, and events.
         </p>
       </div>
-      <span class="version">v0.1 alpha</span>
+      <span class="version">v0.2 preview</span>
     </header>
-
+    <div class="feature-list" aria-label="Features demonstrated by this playground">
+      <span>Chat</span>
+      <span>Streaming</span>
+      <span>Structured output</span>
+      <span>Tools</span>
+      <span>Conversations</span>
+      <span>Files</span>
+      <span>Events</span>
+      <span>Cancellation</span>
+      <span>Fakes in tests</span>
+    </div>
     <div class="playground-grid">
       <form id="ai-form" class="control-panel">
-        <div class="field-row">
+        <div class="field-row provider-row">
           <label>
             Provider
             <select id="provider" name="provider">
               <option value="openai">OpenAI</option>
               <option value="anthropic">Anthropic</option>
+              <option value="gateway">AI Gateway</option>
             </select>
           </label>
           <label>
-            
             Model
-
             <input id="model" name="model" placeholder="Uses config when blank" />
           </label>
         </div>
-
         <label>
           Example
           <select id="mode" name="mode">
             <option value="chat">Ordinary chat</option>
             <option value="tool">Deterministic local weather tool</option>
             <option value="structured">Structured output</option>
+            <option value="conversation">Persistent multi-turn conversation</option>
+            <option value="attachment">Image or PDF input</option>
           </select>
         </label>
-
+        <label id="conversation-field">
+          Conversation ID
+          <input
+            id="conversation-id"
+            name="conversationId"
+            placeholder="Optional, for example demo-chat"
+          />
+        </label>
+        <label id="attachment-source-field">
+          Attachment source
+          <select id="attachment-source" name="attachmentSource">
+            <option value="none">No attachment</option>
+            <option value="upload">Browser file → base64</option>
+            <option value="url">Absolute HTTP(S) URL</option>
+            <option value="base64">Base64 value</option>
+            <option value="bytes">Byte array</option>
+          </select>
+        </label>
+        <label id="attachment-file-field" hidden>
+          Image, PDF, or text file
+          <input
+            id="attachment"
+            name="attachmentFile"
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,text/plain"
+          />
+        </label>
+        <div id="attachment-value-fields" class="attachment-value-fields" hidden>
+          <label id="attachment-url-field" hidden>
+            Attachment URL
+            <input
+              id="attachment-url"
+              name="attachmentUrl"
+              placeholder="https://example.com/image.png"
+            />
+          </label>
+          <label id="attachment-base64-field" hidden>
+            Base64 data
+            <textarea
+              id="attachment-base64"
+              name="attachmentBase64"
+              rows="3"
+              placeholder="iVBORw0KGgo…"
+            ></textarea>
+          </label>
+          <label id="attachment-bytes-field" hidden>
+            Bytes
+            <input id="attachment-bytes" name="attachmentBytes" placeholder="137, 80, 78, 71" />
+          </label>
+          <div class="field-row">
+            <label>
+              MIME type
+              <input
+                id="attachment-media-type"
+                name="attachmentMediaType"
+                placeholder="image/png"
+              />
+            </label>
+            <label>
+              Filename
+              <input id="attachment-filename" name="attachmentFilename" placeholder="Optional" />
+            </label>
+          </div>
+        </div>
         <label>
-          
           Prompt
-
           <textarea
             id="prompt"
             name="prompt"
             rows="7"
           >Explain why async iterables are useful for AI streaming.</textarea>
         </label>
-
+        <details class="advanced-options">
+          <summary>Advanced run options</summary>
+          <div class="advanced-fields">
+            <div class="field-row compact">
+              <label>
+                Max steps
+                <input name="maxSteps" type="number" min="1" step="1" value="8" />
+              </label>
+              <label>
+                Output tokens
+                <input name="maxOutputTokens" type="number" min="1" step="1" value="4096" />
+              </label>
+            </div>
+            <div class="field-row compact">
+              <label>
+                Temperature
+                <input name="temperature" type="number" step="0.1" placeholder="Provider default" />
+              </label>
+              <label>
+                Timeout (ms)
+                <input name="timeout" type="number" min="1" step="1" value="60000" />
+              </label>
+            </div>
+            <label>
+              Tool error behavior
+              <select name="toolErrorMode">
+                <option value="report">Report error to the model</option>
+                <option value="throw">Fail the run</option>
+              </select>
+            </label>
+            <label>
+              One-off message history (JSON)
+              <textarea
+                name="messages"
+                rows="4"
+                placeholder='[{"role":"user","content":"Prior question"},{"role":"assistant","content":"Prior answer"}]'
+              ></textarea>
+            </label>
+            <label>
+              Provider options (JSON)
+              <textarea
+                name="providerOptions"
+                rows="3"
+                placeholder='{"reasoningEffort":"low"}'
+              ></textarea>
+            </label>
+            <label class="checkbox-row">
+              <input name="includeRaw" type="checkbox" value="true" />
+              Include provider raw payloads in the result
+            </label>
+          </div>
+        </details>
         <div class="actions">
           <button type="submit">Run agent</button>
           <button id="stream-button" class="secondary" type="button">Stream response</button>
+          <button id="cancel-button" class="danger" type="button" disabled>Cancel</button>
         </div>
         <p class="hint">
-          Weather mode uses a local deterministic tool. Other modes call the selected provider.
+          Weather mode uses a local deterministic tool. Conversation history is application-owned. Gateway attachments intentionally fail unless capabilities are declared in config.
         </p>
       </form>
-
       <section class="result-panel" aria-live="polite">
         <div class="result-heading">
           <h2>Response</h2>
@@ -65,10 +189,13 @@
         </div>
         <pre id="answer" class="answer">Choose a mode and run the agent.</pre>
         <div id="error" class="error" hidden></div>
-
-        <div class="inspector-grid">
+        <div class="inspector-grid three-column">
           <section>
-            <h3>Usage</h3>
+            <h3>Safe request</h3>
+            <pre id="request-inspector">—</pre>
+          </section>
+          <section>
+            <h3>Response metadata</h3>
             <pre id="usage">—</pre>
           </section>
           <section>
@@ -76,7 +203,10 @@
             <pre id="steps">—</pre>
           </section>
         </div>
-
+        <section>
+          <h3>Opt-in raw payload</h3>
+          <pre id="raw">Enable “Include provider raw payloads” to inspect this field.</pre>
+        </section>
         <section>
           <h3>Normalized event log</h3>
           <pre id="events" class="events">—</pre>

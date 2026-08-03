@@ -42,7 +42,7 @@ The [0.1 public API, provider, security, testing, troubleshooting, and upgrade g
 - Queued or dynamic fakes with prompt assertions and stray-call prevention
 - A real AdonisJS playground with functional and browser tests
 
-The current Adonis agent surface covers text generation, streaming, structured output, application tools, provider options, retries, timeouts, cancellation, and middleware-wrapped language models. Multimodal messages, provider-executed tools, embeddings, image/video generation, speech, transcription, reranking, realtime, stored conversations, queues, approvals, MCP, and vector stores need dedicated public APIs and remain deferred.
+The current Adonis agent surface covers text generation, streaming, structured output, application tools, provider-neutral image/document input, application-owned conversations, provider options, retries, timeouts, cancellation, and middleware-wrapped language models. Provider-executed tools, embeddings, image/video generation, speech, transcription, reranking, realtime, provider-stored conversations, queues, approvals, MCP, and vector stores remain deferred.
 
 ## Repository layout
 
@@ -182,6 +182,44 @@ const weather = defineTool({
 
 Return tools from an agent’s `tools()` method. Multiple tool requests are executed sequentially in provider order. The default maximum is eight model steps. Input and handler errors are sent back to the model as safe tool results; pass `{ toolErrorMode: 'throw' }` to stop immediately.
 
+## Conversations
+
+Register an application-owned store and pass a conversation identifier. The SDK loads history before the run and atomically appends the successful user, assistant, and tool messages before emitting completion.
+
+```ts
+import type { ConversationStore } from "adonis-ai";
+
+const conversations: ConversationStore = {
+  load: (id) => database.loadMessages(id),
+  append: (id, turn) => database.appendTurn(id, turn.runId, turn.messages),
+};
+
+ai.useConversationStore(conversations);
+await agent.prompt("Continue our discussion", {
+  conversation: { id: "conversation_123" },
+});
+```
+
+Nothing is persisted by default. Failed, cancelled, and maximum-step runs append nothing; load or append failures reject with `ConversationPersistenceError`.
+
+## Image and document input
+
+String prompts remain supported. For multimodal input, pass text and file parts using bytes, base64, or an absolute HTTP(S) URL.
+
+```ts
+await agent.prompt([
+  { type: "text", text: "Summarize this report" },
+  {
+    type: "file",
+    mediaType: "application/pdf",
+    filename: "report.pdf",
+    source: { type: "bytes", data: uploadedBytes },
+  },
+]);
+```
+
+Direct OpenAI and Anthropic support JPEG, PNG, GIF, WebP, and PDF; Anthropic also supports `text/plain`. Gateway and custom adapters must declare attachment capabilities explicitly. Applications own file-size limits, URL policy, durable storage, and upload authorization. See the [conversations and files guide](./docs/conversations-and-files.md).
+
 ## Testing
 
 ```ts
@@ -211,8 +249,13 @@ npm run check
 npm run dev --workspace playground
 ```
 
-The playground resolves `adonis-ai` directly from the local workspace. To verify the exact
-artifact that npm consumers receive, run the isolated package-consumer check:
+The playground resolves `adonis-ai` directly from the local workspace and acts as an executable
+feature catalog. It covers direct providers and Gateway, ordinary and structured generation,
+streaming, local tools, application-owned conversations, every attachment source, one-off message
+history, run limits, provider options, raw response opt-in, normalized events, and cancellation.
+Its functional and browser suites use package fakes, so the examples stay deterministic.
+
+To verify the exact artifact that npm consumers receive, run the isolated package-consumer check:
 
 ```bash
 npm run test:package-consumer

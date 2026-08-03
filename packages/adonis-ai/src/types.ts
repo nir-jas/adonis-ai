@@ -3,12 +3,32 @@ import type { z } from "zod";
 export type Awaitable<T> = T | Promise<T>;
 export type OutputSchema = z.ZodType;
 
+export interface TextContentPart {
+  type: "text";
+  text: string;
+}
+
+export type FileSource =
+  | { type: "bytes"; data: Uint8Array }
+  | { type: "base64"; data: string }
+  | { type: "url"; url: string };
+
+export interface FileContentPart {
+  type: "file";
+  source: FileSource;
+  mediaType: string;
+  filename?: string;
+}
+
+export type UserContent =
+  string | readonly (TextContentPart | FileContentPart)[];
+
 export type InferAgentOutput<TSchema extends OutputSchema | undefined> =
   TSchema extends OutputSchema ? z.output<TSchema> : undefined;
 
 export interface UserMessage {
   role: "user";
-  content: string;
+  content: UserContent;
 }
 
 export interface AssistantMessage {
@@ -25,8 +45,34 @@ export interface ToolMessage {
   isError?: boolean;
 }
 
-export type Message = UserMessage | AssistantMessage;
-export type InternalMessage = Message | ToolMessage;
+export type Message = UserMessage | AssistantMessage | ToolMessage;
+export type InternalMessage = Message;
+
+export interface ConversationRunContext {
+  runId: string;
+  signal: AbortSignal;
+}
+
+export interface ConversationTurn {
+  runId: string;
+  messages: readonly Message[];
+}
+
+export interface ConversationStore {
+  load(
+    id: string,
+    context: ConversationRunContext,
+  ): Awaitable<readonly Message[]>;
+  append(
+    id: string,
+    turn: ConversationTurn,
+    context: ConversationRunContext,
+  ): Awaitable<void>;
+}
+
+export interface ConversationOptions {
+  id: string;
+}
 
 export interface TokenUsage {
   inputTokens: number;
@@ -91,11 +137,22 @@ export interface RunOptions {
   toolErrorMode?: ToolErrorMode;
   includeRaw?: boolean;
   providerOptions?: Record<string, unknown>;
+  conversation?: ConversationOptions;
+}
+
+export interface AttachmentRecord {
+  mediaType: string;
+  filename?: string;
+  source: FileSource["type"];
 }
 
 export interface PromptRecord {
   agent: string;
   prompt: string;
+  input?: UserContent;
+  messages?: readonly Message[];
+  conversationId?: string;
+  attachments?: readonly AttachmentRecord[];
   provider: string;
   model: string;
   options: RunOptions;
