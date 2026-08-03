@@ -1,6 +1,5 @@
 export { agent, BaseAgent } from "./src/agent.js";
 export { configure } from "./configure.js";
-export { stubsRoot } from "./stubs/main.js";
 export type { AgentDefinition, AgentLike } from "./src/agent.js";
 export { defineConfig } from "./src/config.js";
 export type {
@@ -25,6 +24,7 @@ export {
   ToolExecutionError,
 } from "./src/errors.js";
 export { AiManager } from "./src/manager.js";
+export type { ManagerOptions } from "./src/manager.js";
 export { AgentStream } from "./src/stream.js";
 export { BaseTool, defineTool } from "./src/tool.js";
 export type { Tool, ToolContext, ToolDefinition } from "./src/tool.js";
@@ -44,3 +44,12 @@ export type {
   ToolExecution,
   UserMessage,
 } from "./src/types.js";
+export type {
+  AiEventDispatcher,
+  AiEvents,
+  AiRunCompletedEvent,
+  AiRunEvent,
+  AiRunFailedEvent,
+  AiToolCompletedEvent,
+  AiToolEvent,
+} from "./src/events.js";

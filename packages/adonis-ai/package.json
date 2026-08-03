@@ -33,6 +33,7 @@
   "exports": {
     ".": "./build/index.js",
     "./provider": "./build/src/provider.js",
+    "./events": "./build/src/events.js",
     "./providers/ai-sdk": "./build/src/providers/ai_sdk_provider.js",
     "./providers/openai": "./build/src/providers/openai_provider.js",
     "./providers/anthropic": "./build/src/providers/anthropic_provider.js",

@@ -1,6 +1,7 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import {
   copyFileSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -17,6 +18,7 @@ const packageRoot = join(workspaceRoot, "packages", "adonis-ai");
 const playgroundRoot = join(workspaceRoot, "apps", "playground");
 const temporaryRoot = mkdtempSync(join(tmpdir(), "adonis-ai-consumer-"));
 const consumerRoot = join(temporaryRoot, "playground");
+const configureRoot = join(temporaryRoot, "configure-fixture");
 const npmCache = join(temporaryRoot, "npm-cache");
 
 function run(command, args, cwd = workspaceRoot) {
@@ -48,7 +50,7 @@ function run(command, args, cwd = workspaceRoot) {
   }
 }
 
-function copyTrackedPlayground() {
+function copyTrackedPlayground(destinationRoot) {
   const tracked = execFileSync(
     "git",
     ["ls-files", "-z", "--", "apps/playground"],
@@ -59,10 +61,50 @@ function copyTrackedPlayground() {
 
   for (const trackedPath of tracked) {
     const source = join(workspaceRoot, trackedPath);
-    const destination = join(consumerRoot, relative(playgroundRoot, source));
+    const destination = join(destinationRoot, relative(playgroundRoot, source));
     mkdirSync(dirname(destination), { recursive: true });
     copyFileSync(source, destination);
   }
+}
+
+function usePackedPackage(root, tarballPath, packageName) {
+  const consumerManifestPath = join(root, "package.json");
+  const consumerManifest = JSON.parse(
+    readFileSync(consumerManifestPath, "utf8"),
+  );
+  consumerManifest.dependencies[packageName] =
+    `file:../${basename(tarballPath)}`;
+  writeFileSync(
+    consumerManifestPath,
+    `${JSON.stringify(consumerManifest, null, 2)}\n`,
+  );
+}
+
+function prepareUnconfiguredFixture() {
+  rmSync(join(configureRoot, "config", "ai.ts"), { force: true });
+
+  const adonisrcPath = join(configureRoot, "adonisrc.ts");
+  const adonisrc = readFileSync(adonisrcPath, "utf8")
+    .replace(/^\s*\(\) => import\('adonis-ai\/commands'\),\n/m, "")
+    .replace(/^\s*\(\) => import\('adonis-ai\/ai_provider'\),\n/m, "");
+  writeFileSync(adonisrcPath, adonisrc);
+
+  const envPath = join(configureRoot, "start", "env.ts");
+  const envSource = readFileSync(envPath, "utf8").replace(
+    /\n  \/\*\n  \|----------------------------------------------------------\n  \| AI providers[\s\S]*?AI_GATEWAY_MODEL: Env\.schema\.string\.optional\(\),\n/,
+    "",
+  );
+  writeFileSync(envPath, envSource);
+
+  const envExamplePath = join(configureRoot, ".env.example");
+  const envExample = readFileSync(envExamplePath, "utf8")
+    .split("\n")
+    .filter(
+      (line) =>
+        !/^(AI_DEFAULT_PROVIDER|OPENAI_|ANTHROPIC_|AI_GATEWAY_)/.test(line),
+    )
+    .join("\n");
+  writeFileSync(envExamplePath, envExample);
 }
 
 try {
@@ -81,18 +123,8 @@ try {
   const tarballName = `${packageManifest.name}-${packageManifest.version}.tgz`;
   const tarballPath = join(temporaryRoot, tarballName);
 
-  copyTrackedPlayground();
-
-  const consumerManifestPath = join(consumerRoot, "package.json");
-  const consumerManifest = JSON.parse(
-    readFileSync(consumerManifestPath, "utf8"),
-  );
-  consumerManifest.dependencies[packageManifest.name] =
-    `file:../${basename(tarballPath)}`;
-  writeFileSync(
-    consumerManifestPath,
-    `${JSON.stringify(consumerManifest, null, 2)}\n`,
-  );
+  copyTrackedPlayground(consumerRoot);
+  usePackedPackage(consumerRoot, tarballPath, packageManifest.name);
 
   run("npm", ["install", "--no-audit", "--no-fund"], consumerRoot);
 
@@ -117,8 +149,44 @@ try {
   run("npm", ["test"], consumerRoot);
   run("npm", ["run", "build"], consumerRoot);
 
+  copyTrackedPlayground(configureRoot);
+  prepareUnconfiguredFixture();
+  usePackedPackage(configureRoot, tarballPath, packageManifest.name);
+  run("npm", ["install", "--no-audit", "--no-fund"], configureRoot);
+  run(
+    "node",
+    ["ace", "configure", "adonis-ai", "--no-interaction"],
+    configureRoot,
+  );
+  run(
+    "node",
+    ["ace", "configure", "adonis-ai", "--no-interaction"],
+    configureRoot,
+  );
+  run("node", ["ace", "make:ai-agent", "Fixture"], configureRoot);
+  run(
+    "node",
+    ["ace", "make:ai-agent", "StructuredFixture", "--structured"],
+    configureRoot,
+  );
+  run("node", ["ace", "make:ai-tool", "Fixture"], configureRoot);
+
+  for (const generatedPath of [
+    "config/ai.ts",
+    "app/ai/agents/fixture_agent.ts",
+    "app/ai/agents/structured_fixture_agent.ts",
+    "app/ai/tools/fixture_tool.ts",
+  ]) {
+    if (!existsSync(join(configureRoot, generatedPath))) {
+      throw new Error(`Configure fixture did not generate ${generatedPath}`);
+    }
+  }
+
+  run("npm", ["run", "typecheck"], configureRoot);
+  run("npm", ["run", "build"], configureRoot);
+
   console.log(
-    `Verified ${packageManifest.name}@${packageManifest.version} from ${tarballName}`,
+    `Verified ${packageManifest.name}@${packageManifest.version} from ${tarballName}, including configure and generators`,
   );
 } finally {
   rmSync(temporaryRoot, { recursive: true, force: true });

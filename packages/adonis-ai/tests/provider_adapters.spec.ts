@@ -113,7 +113,7 @@ describe("provider adapters", () => {
       },
     });
 
-    const response = await provider.complete(request());
+    const response = await provider.complete(request({ includeRaw: true }));
 
     assert.equal(body?.model, "test-model");
     assert.equal(body?.store, false);
@@ -122,6 +122,7 @@ describe("provider adapters", () => {
       content: "Be concise.",
     });
     assert.equal(response.text, "Hello from OpenAI");
+    assert.deepEqual(response.requestId, "request_1");
     assert.deepEqual(response.usage, {
       inputTokens: 4,
       outputTokens: 3,
@@ -238,6 +239,50 @@ describe("provider adapters", () => {
     assert.deepEqual(response.toolCalls, [
       { id: "tool_1", name: "weather", arguments: { city: "Paris" } },
     ]);
+  });
+
+  it("normalizes provider authentication and rate-limit failures", async () => {
+    const authentication = new OpenAiProvider({
+      apiKey: "test",
+      maxRetries: 0,
+      fetch: async () =>
+        Response.json(
+          {
+            error: {
+              message: "invalid credential",
+              type: "authentication_error",
+            },
+          },
+          { status: 401 },
+        ),
+    });
+    const rateLimited = new AnthropicProvider({
+      apiKey: "test",
+      maxRetries: 0,
+      fetch: async () =>
+        Response.json(
+          {
+            type: "error",
+            error: { type: "rate_limit_error", message: "slow down" },
+          },
+          { status: 429 },
+        ),
+    });
+
+    await assert.rejects(
+      authentication.complete(request()),
+      (error: unknown) =>
+        (error as { code?: string; status?: number }).code ===
+          "E_AI_AUTHENTICATION" &&
+        (error as { status?: number }).status === 401,
+    );
+    await assert.rejects(
+      rateLimited.complete(request()),
+      (error: unknown) =>
+        (error as { code?: string; retryable?: boolean }).code ===
+          "E_AI_RATE_LIMIT" &&
+        (error as { retryable?: boolean }).retryable === true,
+    );
   });
 
   it("normalizes OpenAI Responses streaming events", async () => {

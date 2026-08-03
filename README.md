@@ -14,6 +14,8 @@ A Laravel-inspired, agent-oriented AI SDK for AdonisJS 7.
 
 > Status: `0.1.0-alpha.0`. The public API is usable, but may change before `0.1.0`.
 
+The [0.1 public API, provider, security, testing, troubleshooting, and upgrade guide](./docs/guide.md) defines the supported stable contract.
+
 ## Compatibility
 
 | Dependency    | Supported version                                |

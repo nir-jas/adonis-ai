@@ -24,7 +24,7 @@ export async function configure(command: Configure): Promise<void> {
     leadingComment: "AI providers",
     variables: {
       AI_DEFAULT_PROVIDER:
-        "Env.schema.enum.optional(['openai', 'anthropic'] as const)",
+        "Env.schema.enum.optional(['openai', 'anthropic', 'gateway'] as const)",
       OPENAI_API_KEY: "Env.schema.string.optional()",
       OPENAI_MODEL: "Env.schema.string.optional()",
       ANTHROPIC_API_KEY: "Env.schema.string.optional()",
