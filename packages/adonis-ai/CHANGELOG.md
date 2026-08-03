@@ -1,5 +1,11 @@
 # adonis-ai
 
+## 0.1.0-alpha.3
+
+### Patch Changes
+
+- [#33](https://github.com/nir-jas/adonis-ai/pull/33) [`cc95666`](https://github.com/nir-jas/adonis-ai/commit/cc956665a104da6dfd5225f16fa0f26f1a911be1) Thanks [@nir-jas](https://github.com/nir-jas)! - Align the package positioning and published documentation with the 0.1 conversations and file-input contract, and make prerelease npm tags explicit during publication.
+
 ## 0.1.0-alpha.2
 
 ### Minor Changes
