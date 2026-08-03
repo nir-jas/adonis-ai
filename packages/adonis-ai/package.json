@@ -1,6 +1,6 @@
 {
   "name": "adonis-ai",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "description": "An agent-oriented AI SDK for AdonisJS 7",
   "keywords": [
     "adonisjs",
