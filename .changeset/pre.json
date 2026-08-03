@@ -5,5 +5,7 @@
     "playground": "0.0.0",
     "adonis-ai": "0.1.0-alpha.0"
   },
-  "changesets": []
+  "changesets": [
+    "calm-oranges-unify"
+  ]
 }
