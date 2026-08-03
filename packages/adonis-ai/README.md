@@ -60,10 +60,13 @@ console.log(response.text);
 - Built-in direct OpenAI Responses and Anthropic Messages drivers
 - Async-iterable streaming and Adonis-friendly SSE conversion
 - Zod 4 structured output and validated application tools
+- Provider-neutral image/PDF input and application-owned conversations
 - Normalized usage, steps, request IDs, errors, and events
 - IoC integration, Ace generators, cancellation, and testing fakes
 
 See the [full documentation and playground](https://github.com/nir-jas/adonis-ai#readme). Ask questions in [Discussions](https://github.com/nir-jas/adonis-ai/discussions), report bugs through [Issues](https://github.com/nir-jas/adonis-ai/issues), and report vulnerabilities through [private security advisories](https://github.com/nir-jas/adonis-ai/security/advisories/new).
+
+The 0.2 message model keeps string prompts compatible while adding typed text/file parts, opt-in `ConversationStore` persistence, capability preflight, and redacted attachment observability. See the [conversations and files guide](https://github.com/nir-jas/adonis-ai/blob/main/docs/conversations-and-files.md).
 
 [tests-image]: https://img.shields.io/github/actions/workflow/status/nir-jas/adonis-ai/ci.yml?branch=main&label=Tests&style=for-the-badge&colorA=15122e&colorB=8b7cff&logo=githubactions&logoColor=white
 [tests-url]: https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml

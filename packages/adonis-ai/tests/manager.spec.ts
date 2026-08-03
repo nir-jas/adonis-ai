@@ -5,12 +5,15 @@ import {
   AbortedRequestError,
   AiError,
   AiManager,
+  ConversationPersistenceError,
   MaxStepsExceededError,
   StructuredOutputError,
   ToolExecutionError,
+  UnsupportedCapabilityError,
   agent,
   defineTool,
 } from "../index.js";
+import type { ConversationStore, Message } from "../index.js";
 import type {
   ProviderAdapter,
   ProviderRequest,
@@ -291,8 +294,15 @@ describe("AiManager", () => {
       default: "slow",
       providers: { slow: { driver: "slow", model: "slow-model" } },
     });
+    let appendCount = 0;
+    ai.useConversationStore({
+      load: () => [],
+      append: () => void appendCount++,
+    });
     ai.extend("slow", () => slowProvider);
-    const stream = ai.stream(agent({ instructions: "Wait." }), "Wait");
+    const stream = ai.stream(agent({ instructions: "Wait." }), "Wait", {
+      conversation: { id: "cancelled_conversation" },
+    });
     const readable = stream.toSseReadable();
     readable.on("error", () => {});
     readable.once("data", () => readable.destroy());
@@ -302,6 +312,7 @@ describe("AiManager", () => {
       stream.finalResponse(),
       (error: unknown) => error instanceof AbortedRequestError,
     );
+    assert.equal(appendCount, 0);
   });
 
   it("rejects partial streams that end without a completed provider response", async () => {
@@ -365,5 +376,211 @@ describe("AiManager", () => {
 
     assert.deepEqual(streamEvents, ["run.started", "run.failed"]);
     assert.deepEqual(dispatched, ["ai:run_started", "ai:run_failed"]);
+  });
+
+  it("loads conversation history in order and atomically appends a tool-assisted turn", async () => {
+    const history: Message[] = [
+      { role: "user", content: "Earlier question" },
+      { role: "assistant", content: "Earlier answer" },
+    ];
+    const appended: Message[][] = [];
+    const store: ConversationStore = {
+      load: () => history,
+      append(_id, turn) {
+        appended.push([...turn.messages]);
+      },
+    };
+    const ai = makeManager().useConversationStore(store);
+    const lookup = defineTool({
+      name: "lookup",
+      description: "Look up a value",
+      input: z.object({ value: z.string() }),
+      execute: ({ value }) => ({ value }),
+    });
+    const assistant = agent({
+      instructions: "Use context.",
+      messages: [{ role: "user", content: "Seed example" }],
+      tools: [lookup],
+    });
+    const requests: Message[][] = [];
+    ai.fake((_record, request) => {
+      requests.push([...request.messages]);
+      return request.messages.some((message) => message.role === "tool")
+        ? "Final answer"
+        : {
+            toolCalls: [
+              {
+                id: "lookup_1",
+                name: "lookup",
+                arguments: { value: "current" },
+              },
+            ],
+          };
+    }).preventStrayRequests();
+
+    const response = await ai.prompt(assistant, "Current question", {
+      conversation: { id: "conversation_1" },
+      messages: [{ role: "assistant", content: "One-off context" }],
+    });
+
+    assert.deepEqual(
+      requests[0]?.slice(0, 5).map((message) => message.role),
+      ["user", "user", "assistant", "assistant", "user"],
+    );
+    assert.equal(response.text, "Final answer");
+    assert.equal(appended.length, 1);
+    assert.deepEqual(
+      appended[0]?.map((message) => message.role),
+      ["user", "assistant", "tool", "assistant"],
+    );
+    assert.equal(appended[0]?.[0]?.role, "user");
+    assert.equal(
+      appended[0]?.[0]?.role === "user" ? appended[0][0].content : "",
+      "Current question",
+    );
+  });
+
+  it("fails the run when conversation persistence fails", async () => {
+    const dispatched: string[] = [];
+    const ai = new AiManager(
+      {
+        default: "openai",
+        providers: {
+          openai: { driver: "openai", apiKey: "", model: "test-model" },
+        },
+      },
+      { events: { emit: (event) => void dispatched.push(event) } },
+    ).useConversationStore({
+      load: () => [],
+      append() {
+        throw new Error("database unavailable");
+      },
+    });
+    ai.fake(["Generated but not persisted"]).preventStrayRequests();
+
+    await assert.rejects(
+      ai.prompt(agent({ instructions: "Answer." }), "Question", {
+        conversation: { id: "conversation_2" },
+      }),
+      (error: unknown) =>
+        error instanceof ConversationPersistenceError &&
+        error.operation === "append",
+    );
+    assert.deepEqual(dispatched, [
+      "ai:run_started",
+      "ai:conversation_loaded",
+      "ai:conversation_failed",
+      "ai:run_failed",
+    ]);
+  });
+
+  it("does not append failed structured runs", async () => {
+    let appendCount = 0;
+    const ai = makeManager().useConversationStore({
+      load: () => [],
+      append() {
+        appendCount++;
+      },
+    });
+    const assistant = agent({
+      instructions: "Return JSON.",
+      output: z.object({ answer: z.string() }),
+    });
+    ai.fake([{ data: { answer: 42 } }]).preventStrayRequests();
+
+    await assert.rejects(
+      ai.prompt(assistant, "Question", {
+        conversation: { id: "conversation_3" },
+      }),
+    );
+    assert.equal(appendCount, 0);
+  });
+
+  it("validates attachments and provider declarations before a request", async () => {
+    let requested = false;
+    const textOnlyProvider: ProviderAdapter = {
+      name: "text-only",
+      capabilities: { streaming: true, tools: true, structuredOutput: true },
+      async complete() {
+        requested = true;
+        throw new Error("Must not run");
+      },
+      async *stream() {
+        requested = true;
+      },
+    };
+    const ai = new AiManager({
+      default: "text-only",
+      providers: { "text-only": { driver: "text-only", model: "model" } },
+    });
+    ai.extend("text-only", () => textOnlyProvider);
+
+    await assert.rejects(
+      ai.prompt(agent({ instructions: "Inspect." }), [
+        { type: "text", text: "What is shown?" },
+        {
+          type: "file",
+          mediaType: "image/png",
+          source: { type: "base64", data: "aGVsbG8=" },
+        },
+      ]),
+      (error: unknown) => error instanceof UnsupportedCapabilityError,
+    );
+    assert.equal(requested, false);
+  });
+
+  it("rejects malformed attachment sources before fake execution", async () => {
+    const ai = makeManager();
+    const fake = ai.fake(["Must not be consumed"]).preventStrayRequests();
+
+    await assert.rejects(
+      ai.prompt(agent({ instructions: "Inspect." }), [
+        {
+          type: "file",
+          mediaType: "application/pdf",
+          source: { type: "base64", data: "not base64" },
+        },
+      ]),
+      (error: unknown) =>
+        error instanceof AiError && error.code === "E_AI_INVALID_REQUEST",
+    );
+    assert.equal(fake.prompts().length, 0);
+  });
+
+  it("records redacted attachment metadata for fake assertions", async () => {
+    const payloads: unknown[] = [];
+    const ai = new AiManager(
+      {
+        default: "openai",
+        includeContentInEvents: true,
+        providers: {
+          openai: { driver: "openai", apiKey: "", model: "test-model" },
+        },
+      },
+      { events: { emit: (_event, payload) => void payloads.push(payload) } },
+    );
+    const fake = ai.fake(["Image received"]).preventStrayRequests();
+    await ai.prompt(agent({ instructions: "Inspect." }), [
+      { type: "text", text: "Inspect this" },
+      {
+        type: "file",
+        mediaType: "image/png",
+        filename: "sample.png",
+        source: { type: "bytes", data: new Uint8Array([1, 2, 3]) },
+      },
+    ]);
+
+    fake.assertPrompted({
+      attachment: {
+        mediaType: "image/png",
+        filename: "sample.png",
+        source: "bytes",
+      },
+    });
+    const serialized = JSON.stringify(payloads);
+    assert.match(serialized, /Inspect this/);
+    assert.match(serialized, /sample\.png/);
+    assert.doesNotMatch(serialized, /"data"/);
+    assert.doesNotMatch(serialized, /1,2,3/);
   });
 });

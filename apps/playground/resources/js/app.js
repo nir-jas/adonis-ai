@@ -12,7 +12,23 @@ if (form) {
   const prompt = document.querySelector('#prompt')
   const mode = document.querySelector('#mode')
 
-  const payload = () => Object.fromEntries(new FormData(form).entries())
+  const payload = async () => {
+    const formData = new FormData(form)
+    const file = formData.get('attachmentFile')
+    formData.delete('attachmentFile')
+    const value = Object.fromEntries(formData.entries())
+    if (file instanceof File && file.size > 0) {
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      let binary = ''
+      for (const byte of bytes) binary += String.fromCharCode(byte)
+      value.attachment = {
+        base64: btoa(binary),
+        filename: file.name,
+        mediaType: file.type || 'application/octet-stream',
+      }
+    }
+    return value
+  }
   const pretty = (value) => JSON.stringify(value, null, 2)
   const setStatus = (label, state) => {
     status.textContent = label
@@ -30,16 +46,18 @@ if (form) {
     errorBox.textContent = details?.message ?? 'The request failed.'
     setStatus('Failed', 'failed')
   }
-  const post = (path) =>
+  const post = async (path) =>
     fetch(path, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-csrf-token': csrf },
-      body: JSON.stringify(payload()),
+      body: JSON.stringify(await payload()),
     })
 
   mode.addEventListener('change', () => {
     if (mode.value === 'tool') prompt.value = 'What is the weather in Ahmedabad?'
     if (mode.value === 'structured') prompt.value = 'Summarize the advantages of AdonisJS.'
+    if (mode.value === 'conversation') prompt.value = 'Continue this conversation.'
+    if (mode.value === 'attachment') prompt.value = 'Describe the attached file.'
     if (mode.value === 'chat') {
       prompt.value = 'Explain why async iterables are useful for AI streaming.'
     }

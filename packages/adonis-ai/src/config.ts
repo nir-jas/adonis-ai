@@ -5,6 +5,10 @@ export interface CommonProviderConfig {
   baseURL?: string;
   maxRetries?: number;
   timeout?: number;
+  attachments?: {
+    images?: readonly string[];
+    documents?: readonly string[];
+  };
   [key: string]: unknown;
 }
 

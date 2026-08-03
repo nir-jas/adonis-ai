@@ -8,7 +8,7 @@
           Run one agent against OpenAI or Anthropic, inspect its steps, and watch normalized events stream in real time.
         </p>
       </div>
-      <span class="version">v0.1 alpha</span>
+      <span class="version">v0.2 preview</span>
     </header>
 
     <div class="playground-grid">
@@ -22,9 +22,7 @@
             </select>
           </label>
           <label>
-            
             Model
-
             <input id="model" name="model" placeholder="Uses config when blank" />
           </label>
         </div>
@@ -35,13 +33,32 @@
             <option value="chat">Ordinary chat</option>
             <option value="tool">Deterministic local weather tool</option>
             <option value="structured">Structured output</option>
+            <option value="conversation">Persistent multi-turn conversation</option>
+            <option value="attachment">Image or PDF input</option>
           </select>
         </label>
 
         <label>
-          
-          Prompt
+          Conversation ID
+          <input
+            id="conversation-id"
+            name="conversationId"
+            placeholder="Optional, for example demo-chat"
+          />
+        </label>
 
+        <label>
+          Image or PDF
+          <input
+            id="attachment"
+            name="attachmentFile"
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,text/plain"
+          />
+        </label>
+
+        <label>
+          Prompt
           <textarea
             id="prompt"
             name="prompt"
@@ -54,7 +71,7 @@
           <button id="stream-button" class="secondary" type="button">Stream response</button>
         </div>
         <p class="hint">
-          Weather mode uses a local deterministic tool. Other modes call the selected provider.
+          Weather mode uses a local deterministic tool. Conversation history is application-owned; selected files are encoded in the browser for this demo.
         </p>
       </form>
 

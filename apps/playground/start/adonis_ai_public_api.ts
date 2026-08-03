@@ -8,7 +8,15 @@ import {
   defineConfig,
   defineTool,
 } from 'adonis-ai'
-import type { AiEvents, ManagerOptions, Message, RunOptions, Tool } from 'adonis-ai'
+import type {
+  AiEvents,
+  ConversationStore,
+  ManagerOptions,
+  Message,
+  RunOptions,
+  Tool,
+  UserContent,
+} from 'adonis-ai'
 import type { AiEventDispatcher } from 'adonis-ai/events'
 import type { ProviderAdapter, ProviderFactory } from 'adonis-ai/provider'
 import { AiSdkProvider } from 'adonis-ai/providers/ai-sdk'
@@ -36,6 +44,7 @@ export const publicApiRuntime = {
 
 export type PublicApiTypes = {
   dispatcher: AiEventDispatcher
+  conversationStore: ConversationStore
   events: AiEvents
   manager: ManagerOptions
   messages: Message[]
@@ -43,4 +52,5 @@ export type PublicApiTypes = {
   provider: ProviderAdapter
   providerFactory: ProviderFactory
   tool: Tool
+  userContent: UserContent
 }

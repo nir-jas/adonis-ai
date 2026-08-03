@@ -28,6 +28,10 @@ export class AnthropicProvider extends AiSdkProvider {
       name,
       providerOptionsKey: "anthropic",
       model: (modelId) => provider.messages(modelId),
+      attachments: {
+        images: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+        documents: ["application/pdf", "text/plain"],
+      },
       ...(config.maxRetries !== undefined
         ? { maxRetries: config.maxRetries }
         : {}),

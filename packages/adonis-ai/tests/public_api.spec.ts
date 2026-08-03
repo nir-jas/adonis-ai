@@ -12,9 +12,11 @@ import {
 import type {
   AiEventDispatcher,
   AiEvents,
+  ConversationStore,
   ManagerOptions,
   Message,
   RunOptions,
+  UserContent,
 } from "../index.js";
 import type {
   ProviderAdapter,
@@ -47,6 +49,18 @@ describe("public API", () => {
   it("keeps the supported type contracts usable", () => {
     const messages: Message[] = [{ role: "user", content: "hello" }];
     const options: RunOptions = { messages };
+    const content: UserContent = [
+      { type: "text", text: "inspect" },
+      {
+        type: "file",
+        mediaType: "image/png",
+        source: { type: "bytes", data: new Uint8Array([1]) },
+      },
+    ];
+    const conversationStore: ConversationStore = {
+      load: () => [],
+      append: () => {},
+    };
     const capabilities: ProviderCapabilities = {
       streaming: true,
       tools: true,
@@ -70,6 +84,8 @@ describe("public API", () => {
     const adapter: ProviderAdapter = factory({}, { name: "test" });
 
     assert.deepEqual(options.messages, messages);
+    assert.equal(Array.isArray(content), true);
+    assert.equal(typeof conversationStore.load, "function");
     assert.deepEqual(managerOptions, {});
     assert.equal(typeof events.emit, "function");
     assert.equal(adapter.name, "test");

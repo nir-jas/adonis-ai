@@ -163,6 +163,7 @@ main {
 }
 
 select,
+input,
 textarea {
   width: 100%;
   border: 1px solid var(--gray-4);
