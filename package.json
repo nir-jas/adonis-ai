@@ -16,6 +16,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "test:package-consumer": "node ./scripts/test-packed-consumer.mjs",
     "typecheck": "turbo run typecheck",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "changeset": "changeset",
