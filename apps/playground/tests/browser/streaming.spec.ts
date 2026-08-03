@@ -17,6 +17,31 @@ test('exposes the complete runtime feature lab', async ({ visit, assert }) => {
   assert.equal(await page.locator('#cancel-button').isDisabled(), true)
 })
 
+test('uses the viewport and stacks cleanly on mobile', async ({ visit, assert }) => {
+  const page = await visit('/')
+  await page.setViewportSize({ width: 1440, height: 1000 })
+
+  const wideMain = await page.locator('main').boundingBox()
+  const wideControls = await page.locator('.control-panel').boundingBox()
+  const wideResults = await page.locator('.result-panel').boundingBox()
+
+  assert.isTrue((wideMain?.width ?? 0) > 1300)
+  assert.isTrue((wideResults?.height ?? Number.POSITIVE_INFINITY) < (wideControls?.height ?? 0))
+
+  await page.setViewportSize({ width: 390, height: 844 })
+  const mobileControls = await page.locator('.control-panel').boundingBox()
+  const mobileResults = await page.locator('.result-panel').boundingBox()
+
+  assert.isTrue(
+    Boolean(
+      mobileControls &&
+      mobileResults &&
+      mobileControls.x === mobileResults.x &&
+      mobileControls.width === mobileResults.width
+    )
+  )
+})
+
 test('shows streamed text in the browser', async ({ visit, assert }) => {
   ai.fake([
     { text: 'Visible streamed answer', chunks: ['Visible ', 'streamed ', 'answer'] },

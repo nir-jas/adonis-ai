@@ -1,9 +1,11 @@
 @layout()
   <section class="playground-shell">
     <header class="playground-header">
-      <div>
+      <div class="playground-title">
         <span class="eyebrow">AdonisJS 7 package lab</span>
         <h1>Adonis AI SDK Playground</h1>
+      </div>
+      <div class="playground-intro">
         <p>
           Exercise every runtime feature against OpenAI, Anthropic, or AI Gateway, then inspect the normalized request, response, tools, usage, and events.
         </p>
@@ -23,7 +25,7 @@
     </div>
     <div class="playground-grid">
       <form id="ai-form" class="control-panel">
-        <div class="field-row">
+        <div class="field-row provider-row">
           <label>
             Provider
             <select id="provider" name="provider">

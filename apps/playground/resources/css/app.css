@@ -50,28 +50,28 @@ h6 {
 }
 
 /* Header */
-header {
+body > header {
   max-width: 1440px;
   margin: auto;
   padding: 0 30px;
 }
-header > div {
+body > header > div {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 64px;
 }
-header nav {
+body > header nav {
   display: flex;
   align-items: center;
   gap: 26px;
 }
-header nav a {
+body > header nav a {
   font-weight: 500;
   color: var(--gray-8);
 }
-header nav a:hover,
-header nav a.current {
+body > header nav a:hover,
+body > header nav a.current {
   color: var(--gray-12);
 }
 
@@ -87,11 +87,21 @@ main {
   border: 1px solid var(--gray-3);
 }
 
-.playground-shell {
-  padding: clamp(24px, 5vw, 72px);
+main:has(.playground-shell) {
+  width: calc(100% - 48px);
+  max-width: 1720px;
+  min-height: calc(100vh - 48px);
+  margin: 24px auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgb(24 24 27 / 7%);
 }
 
-.playground-header,
+.playground-shell {
+  width: 100%;
+  padding: clamp(28px, 3.5vw, 60px);
+}
+
 .result-heading,
 .field-row,
 .actions {
@@ -100,22 +110,26 @@ main {
 }
 
 .playground-header {
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(320px, 1.05fr) auto;
+  align-items: end;
+  gap: clamp(24px, 3vw, 52px);
+  margin-bottom: 28px;
 }
 
 .playground-header h1 {
-  font-size: clamp(34px, 5vw, 56px);
-  letter-spacing: -2px;
-  line-height: 1;
-  margin: 8px 0 14px;
+  max-width: 620px;
+  margin-top: 10px;
+  font-size: clamp(42px, 4vw, 64px);
+  letter-spacing: -0.055em;
+  line-height: 0.96;
 }
 
 .playground-header p {
   color: var(--gray-7);
-  max-width: 720px;
-  font-size: 18px;
+  max-width: 620px;
+  padding-bottom: 4px;
+  font-size: clamp(16px, 1.2vw, 19px);
 }
 
 .eyebrow,
@@ -145,6 +159,7 @@ main {
 }
 
 .version {
+  align-self: center;
   background: #f3e8ff;
   border-radius: 999px;
   padding: 8px 12px;
@@ -153,8 +168,9 @@ main {
 
 .playground-grid {
   display: grid;
-  grid-template-columns: minmax(320px, 0.8fr) minmax(400px, 1.2fr);
-  gap: 24px;
+  grid-template-columns: minmax(360px, 0.78fr) minmax(520px, 1.42fr);
+  align-items: start;
+  gap: clamp(20px, 2vw, 32px);
 }
 
 .control-panel,
@@ -167,15 +183,35 @@ main {
 .control-panel {
   align-self: start;
   background: var(--gray-1);
+  gap: 18px;
 }
 
 .result-panel {
   min-width: 0;
+  background: #fff;
 }
 
 .field-row,
 .actions {
   gap: 12px;
+}
+
+.provider-row > label:first-child {
+  flex: 0.75;
+}
+
+.provider-row > label:last-child {
+  flex: 1.25;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 90px;
+}
+
+.actions button {
+  padding-inline: 8px;
+  white-space: nowrap;
 }
 
 .attachment-value-fields,
@@ -304,7 +340,7 @@ button:disabled {
 }
 
 .answer {
-  min-height: 150px;
+  min-height: 180px;
   border-radius: 10px;
   background: #171717;
   color: #fafafa;
@@ -347,16 +383,34 @@ button:disabled {
 }
 
 .inspector-grid.three-column {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.inspector-grid.three-column section:last-child {
+  grid-column: 1 / -1;
 }
 
 .result-panel > section + section {
   margin-top: 16px;
 }
 
-@media (max-width: 900px) {
-  main {
+@media (min-width: 1600px) {
+  .inspector-grid.three-column {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .inspector-grid.three-column section:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 1050px) {
+  main:has(.playground-shell) {
+    width: 100%;
+    min-height: 100vh;
     margin: 0;
+    border-width: 0;
+    border-radius: 0;
   }
 
   .playground-grid,
@@ -366,7 +420,56 @@ button:disabled {
   }
 
   .playground-header {
+    grid-template-columns: 1fr auto;
     align-items: flex-start;
+  }
+
+  .playground-intro {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .playground-shell {
+    padding: 24px 16px 40px;
+  }
+
+  .playground-header {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .playground-intro,
+  .version {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .version {
+    justify-self: start;
+  }
+
+  .playground-header h1 {
+    font-size: clamp(38px, 13vw, 52px);
+  }
+
+  .playground-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .field-row,
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    display: flex;
+  }
+
+  button.danger {
+    max-width: none;
   }
 }
 
