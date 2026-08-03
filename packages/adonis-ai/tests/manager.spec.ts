@@ -3,9 +3,11 @@ import { describe, it } from "node:test";
 import { z } from "zod";
 import {
   AbortedRequestError,
+  AiError,
   AiManager,
   MaxStepsExceededError,
   StructuredOutputError,
+  ToolExecutionError,
   agent,
   defineTool,
 } from "../index.js";
@@ -137,6 +139,54 @@ describe("AiManager", () => {
     assert.equal(response.steps[0]?.toolExecutions[0]?.isError, true);
   });
 
+  it("reports unknown tools to the model without invoking application code", async () => {
+    const ai = makeManager();
+    const assistant = agent({ instructions: "Use tools." });
+    let toolResult = "";
+    ai.fake((_prompt, request) => {
+      const result = request.messages.findLast(
+        (message) => message.role === "tool",
+      );
+      if (!result) {
+        return {
+          toolCalls: [{ id: "unknown_1", name: "missing", arguments: {} }],
+        };
+      }
+      toolResult = result.content;
+      return "Recovered";
+    }).preventStrayRequests();
+
+    const response = await ai.prompt(assistant, "Try it");
+
+    assert.match(toolResult, /unknown tool/);
+    assert.equal(response.steps[0]?.toolExecutions[0]?.isError, true);
+    assert.equal(response.text, "Recovered");
+  });
+
+  it("throws normalized tool failures in throw mode", async () => {
+    const ai = makeManager();
+    const explode = defineTool({
+      name: "explode",
+      description: "Fail deterministically",
+      input: z.object({}),
+      execute() {
+        throw new Error("secret handler detail");
+      },
+    });
+    const assistant = agent({ instructions: "Use tools.", tools: [explode] });
+    ai.fake([
+      { toolCalls: [{ id: "explode_1", name: "explode", arguments: {} }] },
+    ]).preventStrayRequests();
+
+    await assert.rejects(
+      ai.prompt(assistant, "Explode", { toolErrorMode: "throw" }),
+      (error: unknown) =>
+        error instanceof ToolExecutionError &&
+        error.code === "E_AI_TOOL" &&
+        !error.message.includes("secret handler detail"),
+    );
+  });
+
   it("enforces the maximum tool step count", async () => {
     const ai = makeManager();
     const loop = defineTool({
@@ -252,5 +302,68 @@ describe("AiManager", () => {
       stream.finalResponse(),
       (error: unknown) => error instanceof AbortedRequestError,
     );
+  });
+
+  it("rejects partial streams that end without a completed provider response", async () => {
+    const partialProvider: ProviderAdapter = {
+      name: "partial",
+      capabilities: { streaming: true, tools: true, structuredOutput: true },
+      async complete() {
+        throw new Error("Not used");
+      },
+      async *stream(): AsyncIterable<ProviderStreamEvent> {
+        yield { type: "text.delta", delta: "partial" };
+      },
+    };
+    const ai = new AiManager({
+      default: "partial",
+      providers: { partial: { driver: "partial", model: "partial-model" } },
+    });
+    ai.extend("partial", () => partialProvider);
+    const stream = ai.stream(agent({ instructions: "Stream." }), "Start");
+
+    await assert.rejects(
+      stream.finalResponse(),
+      (error: unknown) =>
+        error instanceof AiError && error.code === "E_AI_PROVIDER",
+    );
+  });
+
+  it("settles failed streams once and orders failure events deterministically", async () => {
+    const dispatched: string[] = [];
+    const failingProvider: ProviderAdapter = {
+      name: "failing",
+      capabilities: { streaming: true, tools: true, structuredOutput: true },
+      async complete() {
+        throw new Error("provider failed");
+      },
+      async *stream(): AsyncIterable<ProviderStreamEvent> {
+        throw new Error("provider failed");
+      },
+    };
+    const ai = new AiManager(
+      {
+        default: "failing",
+        providers: { failing: { driver: "failing", model: "failure-model" } },
+      },
+      {
+        events: {
+          emit(event) {
+            dispatched.push(event);
+          },
+        },
+      },
+    );
+    ai.extend("failing", () => failingProvider);
+    const stream = ai.stream(agent({ instructions: "Fail." }), "private input");
+    const streamEvents: string[] = [];
+
+    await assert.rejects(async () => {
+      for await (const event of stream) streamEvents.push(event.type);
+    });
+    await assert.rejects(stream.finalResponse());
+
+    assert.deepEqual(streamEvents, ["run.started", "run.failed"]);
+    assert.deepEqual(dispatched, ["ai:run_started", "ai:run_failed"]);
   });
 });

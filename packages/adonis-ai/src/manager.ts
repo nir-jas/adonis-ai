@@ -45,7 +45,7 @@ import type {
 } from "./types.js";
 import { addUsage, emptyUsage } from "./types.js";
 
-interface ManagerOptions {
+export interface ManagerOptions {
   events?: AiEventDispatcher;
   makeClass?: <T>(constructor: new (...args: never[]) => T) => Promise<T>;
 }
