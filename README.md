@@ -8,11 +8,11 @@
 
 </div>
 
-A Laravel-inspired, agent-oriented AI SDK for AdonisJS 7.
+An agent-oriented AI SDK for AdonisJS 7.
 
 `adonis-ai` gives Adonis applications one typed API for AI SDK-compatible language models. Use OpenAI and Anthropic directly, reach every model available through Vercel AI Gateway, or register any official, community, self-hosted, registry-backed, or middleware-wrapped AI SDK language model. The first release focuses on the parts needed to build dependable text agents: streaming, structured output, application tools, observability, cancellation, and network-free tests.
 
-> Status: `0.1.0-alpha.0`. The public API is usable, but may change before `0.1.0`.
+> The npm badge above is the source of truth for the current version. During `0.x`, breaking changes ship only at minor-version boundaries with migration notes.
 
 The [0.1 public API, provider, security, testing, troubleshooting, and upgrade guide](./docs/guide.md) defines the supported stable contract.
 
@@ -264,6 +264,8 @@ npm run test:package-consumer
 This packs the SDK, installs the tarball into a temporary standalone copy of the playground,
 and runs its typecheck, tests, and production build.
 
+Maintainers can follow the [release qualification and publication checklist](./docs/releasing.md) to verify live providers, npm dist-tags, provenance, and the published package.
+
 The default suite never calls a real AI API. Live acceptance is opt-in and cost-bounded:
 
 ```bash
@@ -348,7 +350,7 @@ The Vercel AI SDK provider layer translates model requests, responses, errors, u
 
 ## Acknowledgements
 
-The developer experience is inspired by [Laravel AI](https://laravel.com/docs/13.x/ai-sdk), while the implementation follows AdonisJS and TypeScript conventions and uses [Vercel AI SDK Core](https://ai-sdk.dev/docs/ai-sdk-core/overview). OpenAI uses its [Responses API](https://developers.openai.com/api/docs/guides/migrate-to-responses); Anthropic uses its [Messages API](https://platform.claude.com/docs/en/api/messages).
+The developer experience follows AdonisJS and TypeScript conventions and uses [Vercel AI SDK Core](https://ai-sdk.dev/docs/ai-sdk-core/overview). OpenAI uses its [Responses API](https://developers.openai.com/api/docs/guides/migrate-to-responses); Anthropic uses its [Messages API](https://platform.claude.com/docs/en/api/messages).
 
 MIT licensed.
 
