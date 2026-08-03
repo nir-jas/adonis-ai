@@ -15,13 +15,15 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "test": "turbo run test",
+    "test": "turbo run test && npm run test:release-scripts",
+    "test:release-scripts": "node --test scripts/*.spec.mjs",
     "test:package-consumer": "node ./scripts/test-packed-consumer.mjs",
     "typecheck": "turbo run typecheck",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
+    "release": "turbo run build && node ./scripts/publish-packages.mjs",
+    "release:verify": "node ./scripts/verify-published-release.mjs"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.7.0",

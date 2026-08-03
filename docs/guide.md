@@ -26,15 +26,21 @@ Configure explicit models for every enabled provider. API keys are optional at b
 
 Prompt content is omitted from application events by default. Raw provider payloads are omitted unless `includeRaw` is enabled globally or for one run. Tool failures sent back to the model contain the normalized error message, not the original exception. Applications remain responsible for authorization, prompt-data classification, rate limits, and safe tool behavior.
 
+Attachment events expose only MIME type, optional filename, and source kind; bytes, base64 data, and full URLs remain redacted even when content events are enabled. Applications own upload authorization, file-size limits, durable storage, malware handling, and URL/SSRF policy. Conversation history is loaded from an application-owned `ConversationStore`; the application owns transactions, concurrent-writer handling, retention, and idempotency.
+
 ## Provider behavior
 
 All built-in language providers implement the same completion, streaming, structured-output, tool, usage, cancellation, timeout, request-ID, and normalized-error contracts. Model-specific features are passed through `providerOptions`. A custom provider may use `AiSdkProvider` for any AI SDK-compatible `LanguageModel`, or implement `ProviderAdapter` for another transport.
 
-Provider-specific capabilities can still differ by model. The 0.1 contract covers text messages and application-executed tools; multimodal input, provider-executed tools, stored conversations, embeddings, media generation, MCP, and approvals are not part of 0.1.
+Provider-specific capabilities can still differ by model. The 0.1 contract covers text messages, application-executed tools, provider-neutral image/document input, and application-owned conversations. Direct OpenAI and Anthropic adapters declare their supported attachment MIME types. Gateway and custom adapters remain text-only unless they explicitly declare image or document capabilities.
+
+Provider-executed tools, provider-stored conversations, embeddings, media generation, MCP, approvals, queues, and vector stores are not part of 0.1.
 
 ## Testing
 
 Use `ai.fake([...]).preventStrayRequests()` for queued responses, or pass a factory to inspect each normalized provider request. `assertPrompted`, `assertNotPrompted`, and `assertNothingPrompted` inspect recorded prompts without network access. Always restore a fake during teardown when a singleton manager is shared between tests.
+
+Prompt records include assembled message history, an optional conversation ID, and redacted attachment descriptors. Tests can therefore cover persisted history and multimodal routing without exposing attachment payloads or calling a provider.
 
 The repository validates source tests, browser behavior, the production build, and the packed npm tarball installed into an isolated AdonisJS consumer. Live provider acceptance remains opt-in and cost bounded.
 
@@ -52,3 +58,5 @@ The repository validates source tests, browser behavior, the production build, a
 0.1 supports AdonisJS 7, Node.js 24 or newer, Zod 4, and AI SDK 7-compatible language models. During 0.x, breaking changes are released only in a new minor version with a Changeset and migration notes. Deprecations receive at least one minor-release transition when practical.
 
 The alpha-to-stable migration removes `stubsRoot` from the root import while retaining `configure` for AdonisJS compatibility. Application code should not import `stubsRoot`. All other documented 0.1 string-prompt, message, agent, tool, stream, and fake APIs remain supported.
+
+String prompts and string message histories require no migration for the typed message model. Custom providers stay text-only until they declare attachment capabilities and translate array-based user content. Applications that persist messages should narrow on `message.role` because tool-call and tool-result messages are part of replayable conversation history.

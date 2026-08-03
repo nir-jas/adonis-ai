@@ -10,7 +10,7 @@
 
 A typed, agent-oriented AI SDK for AdonisJS 7, built on Vercel AI SDK Core with AI Gateway and any compatible language-model provider.
 
-> Status: `0.1.0-alpha.0`. The public API may change before `0.1.0`.
+> The npm badge above is the source of truth for the current version. During `0.x`, breaking changes ship only at minor-version boundaries with migration notes.
 
 ## Install
 
@@ -66,7 +66,7 @@ console.log(response.text);
 
 See the [full documentation and playground](https://github.com/nir-jas/adonis-ai#readme). Ask questions in [Discussions](https://github.com/nir-jas/adonis-ai/discussions), report bugs through [Issues](https://github.com/nir-jas/adonis-ai/issues), and report vulnerabilities through [private security advisories](https://github.com/nir-jas/adonis-ai/security/advisories/new).
 
-The 0.2 message model keeps string prompts compatible while adding typed text/file parts, opt-in `ConversationStore` persistence, capability preflight, and redacted attachment observability. See the [conversations and files guide](https://github.com/nir-jas/adonis-ai/blob/main/docs/conversations-and-files.md).
+The 0.1 message model keeps string prompts compatible while adding typed text/file parts, opt-in `ConversationStore` persistence, capability preflight, and redacted attachment observability. See the [conversations and files guide](https://github.com/nir-jas/adonis-ai/blob/main/docs/conversations-and-files.md).
 
 [tests-image]: https://img.shields.io/github/actions/workflow/status/nir-jas/adonis-ai/ci.yml?branch=main&label=Tests&style=for-the-badge&colorA=15122e&colorB=8b7cff&logo=githubactions&logoColor=white
 [tests-url]: https://github.com/nir-jas/adonis-ai/actions/workflows/ci.yml
