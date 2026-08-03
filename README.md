@@ -209,6 +209,16 @@ npm run check
 npm run dev --workspace playground
 ```
 
+The playground resolves `adonis-ai` directly from the local workspace. To verify the exact
+artifact that npm consumers receive, run the isolated package-consumer check:
+
+```bash
+npm run test:package-consumer
+```
+
+This packs the SDK, installs the tarball into a temporary standalone copy of the playground,
+and runs its typecheck, tests, and production build.
+
 The default suite never calls a real AI API. Live acceptance is opt-in and cost-bounded:
 
 ```bash
