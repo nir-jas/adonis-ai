@@ -36,6 +36,10 @@ a {
   display: none;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 h1,
 h2,
 h3,
@@ -98,7 +102,7 @@ main {
 .playground-header {
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 .playground-header h1 {
@@ -121,6 +125,23 @@ main {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.feature-list span {
+  border: 1px solid #ddd6fe;
+  border-radius: 999px;
+  background: #faf5ff;
+  color: #6d28d9;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 650;
 }
 
 .version {
@@ -157,6 +178,43 @@ main {
   gap: 12px;
 }
 
+.attachment-value-fields,
+.advanced-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.advanced-options {
+  border: 1px solid var(--gray-3);
+  border-radius: 10px;
+  background: white;
+}
+
+.advanced-options summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  color: var(--gray-8);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.advanced-fields {
+  border-top: 1px solid var(--gray-3);
+  padding: 16px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.checkbox-row input {
+  width: 16px;
+  height: 16px;
+}
+
 .field-row > label,
 .actions > button {
   flex: 1;
@@ -181,6 +239,18 @@ button.secondary {
   background: white;
   border: 1px solid var(--gray-4);
   color: var(--gray-10);
+}
+
+button.danger {
+  max-width: 96px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .hint {
@@ -218,6 +288,11 @@ button.secondary {
 .error {
   color: #991b1b;
   background: #fee2e2;
+}
+
+.status.cancelled {
+  color: #475569;
+  background: #e2e8f0;
 }
 
 .answer,
@@ -261,6 +336,7 @@ button.secondary {
 }
 
 .inspector-grid pre,
+.result-panel > section pre,
 .events {
   max-height: 260px;
   border: 1px solid var(--gray-3);
@@ -270,13 +346,22 @@ button.secondary {
   font-size: 12px;
 }
 
+.inspector-grid.three-column {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.result-panel > section + section {
+  margin-top: 16px;
+}
+
 @media (max-width: 900px) {
   main {
     margin: 0;
   }
 
   .playground-grid,
-  .inspector-grid {
+  .inspector-grid,
+  .inspector-grid.three-column {
     grid-template-columns: 1fr;
   }
 

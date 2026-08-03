@@ -249,8 +249,13 @@ npm run check
 npm run dev --workspace playground
 ```
 
-The playground resolves `adonis-ai` directly from the local workspace. To verify the exact
-artifact that npm consumers receive, run the isolated package-consumer check:
+The playground resolves `adonis-ai` directly from the local workspace and acts as an executable
+feature catalog. It covers direct providers and Gateway, ordinary and structured generation,
+streaming, local tools, application-owned conversations, every attachment source, one-off message
+history, run limits, provider options, raw response opt-in, normalized events, and cancellation.
+Its functional and browser suites use package fakes, so the examples stay deterministic.
+
+To verify the exact artifact that npm consumers receive, run the isolated package-consumer check:
 
 ```bash
 npm run test:package-consumer
