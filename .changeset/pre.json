@@ -6,6 +6,8 @@
     "adonis-ai": "0.1.0-alpha.0"
   },
   "changesets": [
-    "calm-oranges-unify"
+    "brave-cats-stabilize",
+    "calm-oranges-unify",
+    "fuzzy-dogs-converse"
   ]
 }
