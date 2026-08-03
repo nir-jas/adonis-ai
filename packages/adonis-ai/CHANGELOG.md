@@ -1,5 +1,13 @@
 # adonis-ai
 
+## 0.1.0-alpha.2
+
+### Minor Changes
+
+- [#28](https://github.com/nir-jas/adonis-ai/pull/28) [`a69b5f6`](https://github.com/nir-jas/adonis-ai/commit/a69b5f63ae2cdd2f57223ee6e3c89ac34294eebd) Thanks [@nir-jas](https://github.com/nir-jas)! - Freeze the 0.1 public API, expose typed event contracts, correct Gateway configuration validation, and remove the tooling-only stubs helper from the root entrypoint.
+
+- [#29](https://github.com/nir-jas/adonis-ai/pull/29) [`80210de`](https://github.com/nir-jas/adonis-ai/commit/80210dea208ae731a1e5cbb937f311a04786d4b6) Thanks [@nir-jas](https://github.com/nir-jas)! - Add provider-neutral image and document messages, explicit attachment capabilities, application-owned conversation persistence, redacted observability, and conversation-aware testing fakes.
+
 ## 0.1.0-alpha.1
 
 ### Minor Changes
