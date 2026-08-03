@@ -20,8 +20,18 @@ export interface AnthropicProviderConfig extends CommonProviderConfig {
   defaultHeaders?: Record<string, string>;
 }
 
+export interface AiGatewayProviderConfig extends CommonProviderConfig {
+  driver: "gateway";
+  teamIdOrSlug?: string;
+  headers?: Record<string, string>;
+  metadataCacheRefreshMillis?: number;
+}
+
 export type ProviderConfig =
-  OpenAiProviderConfig | AnthropicProviderConfig | CommonProviderConfig;
+  | OpenAiProviderConfig
+  | AnthropicProviderConfig
+  | AiGatewayProviderConfig
+  | CommonProviderConfig;
 
 export interface AiConfig {
   default: string;
