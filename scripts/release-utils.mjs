@@ -6,11 +6,6 @@ export function prereleaseTag(version) {
   return match?.[1];
 }
 
-export function publishArguments(version) {
-  const tag = prereleaseTag(version);
-  return tag ? ["publish", "--tag", tag] : ["publish"];
-}
-
 export function expectedDistTag(version) {
   return prereleaseTag(version) ?? "latest";
 }

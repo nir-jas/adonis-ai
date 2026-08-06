@@ -13,22 +13,15 @@ This checklist covers prerelease and stable publication. It complements the auto
 
 ## Publish
 
-The release workflow runs `npm run release`. The publish wrapper derives the npm dist-tag from the package version: `alpha` versions publish to `alpha`, `rc` versions publish to `rc`, and stable versions publish to `latest`. This avoids prereleases moving the default installation channel before the first stable release.
+The release workflow runs `npm run release`, which delegates package publication and Git tagging to Changesets. Stable versions publish to npm's `latest` tag. After the first stable version exists, future Changesets prerelease modes publish to their configured channel such as `alpha` or `rc`; do not pass a custom `--tag` while prerelease mode is active.
 
-To promote the current prerelease tag once after adopting this wrapper, run:
-
-```bash
-npm dist-tag add adonis-ai@0.1.0-alpha.2 alpha
-```
-
-For the stable release, exit Changesets prerelease mode, review the generated `0.1.0` release PR, and merge only after every qualification step passes.
+For the first stable release, exit Changesets prerelease mode and run the version command so the release PR contains the generated `0.1.0` package version, lockfile, prerelease-state removal, and changelog. Merge only after every qualification step passes.
 
 ## Verify the registry
 
 After npm publication completes, verify the expected dist-tag, integrity metadata, and provenance attestation:
 
 ```bash
-npm run release:verify -- 0.1.0-alpha.2
 npm run release:verify -- 0.1.0
 ```
 
