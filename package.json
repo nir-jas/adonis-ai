@@ -22,7 +22,7 @@
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build && node ./scripts/publish-packages.mjs",
+    "release": "turbo run build && changeset publish",
     "release:verify": "node ./scripts/verify-published-release.mjs"
   },
   "devDependencies": {
