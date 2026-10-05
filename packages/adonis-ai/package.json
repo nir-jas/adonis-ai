@@ -57,10 +57,10 @@
     "prepack": "npm run build"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.25",
-    "@ai-sdk/openai": "^4.0.25",
-    "ai": "^7.0.44",
-    "zod": "^4.4.3"
+    "@ai-sdk/anthropic": "^4.0.71",
+    "@ai-sdk/openai": "^4.0.83",
+    "ai": "^7.0.127",
+    "zod": "^4.6.5"
   },
   "peerDependencies": {
     "@adonisjs/assembler": "^8.0.0",
@@ -72,11 +72,11 @@
     }
   },
   "devDependencies": {
-    "@adonisjs/assembler": "^8.4.0",
-    "@adonisjs/core": "^7.3.5",
+    "@adonisjs/assembler": "^8.5.2",
+    "@adonisjs/core": "^7.5.2",
     "@types/node": "^26.1.2",
-    "prettier": "^3.9.6",
-    "tsx": "^4.23.1",
+    "prettier": "^3.9.9",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3"
   },
   "engines": {
